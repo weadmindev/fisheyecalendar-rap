@@ -11,7 +11,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		},
 
 		destructor : "destroy",
-		methods : [],
+		methods : ['showText'],
 		properties : [ "size"],
 		events:[]
 
@@ -29,15 +29,18 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		this.element = document.createElement("div");
     this.element.style.width="100%";
     this.element.style.height="100%";
+		this.canvasElement = document.createElement("canvas");
 		this.parent.append(this.element);
+		this.parent.append(this.canvasElement);
 		this.parent.addListener("Resize", this.layout);
 
 		this._size = properties.size ? properties.size : {
 			width : 300,
 			height : 300
 		};
-
-
+		
+		this._canvas = new PCanvas(this.canvasElement);
+		this._layer = this._canvas.camera.layers[0];
 
 		rap.on("render", this.onRender);
 	};
@@ -51,14 +54,6 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			// transparent explicitly
 			this.ready = true;
 			this.layout();
-			if (this._text) {
-				// this.setText( this._text );
-				delete this._text;
-			}
-			if (this._font) {
-				// this.setFont( this._font );
-				delete this._font;
-			}
 			console.log("piccolo2djs...onReady..")
 
 		},
@@ -298,8 +293,10 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			//console.log("mxgraph...onSend..")
 		},
 
-
-
+		showText:function(obj){
+			var ptxt = new PText(obj.text);
+			this._layer.addChild(ptxt);
+		},
 		setSize : function(size) {
 			if (this.ready) {
 				async(this, function() { // Needed by IE for some reason
