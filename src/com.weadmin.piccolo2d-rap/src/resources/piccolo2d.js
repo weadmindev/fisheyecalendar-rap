@@ -795,13 +795,13 @@ window.PCamera = window.PNode.subClass({
 
 window.PCanvas = Object.subClass({
   init: function (canvas, root) {
-    if (typeof canvas === "string") {
-      canvas = document.getElementById(canvas);
-    }
-
-    if (!canvas) {
-      throw "Canvas provided to Piccolo is invalid!";
-    }
+//    if (typeof canvas === "string") {
+//      canvas = document.getElementById(canvas);
+//    }
+//
+//    if (!canvas) {
+//      throw "Canvas provided to Piccolo is invalid!";
+//    }
 
     var _pCanvas = this;
 

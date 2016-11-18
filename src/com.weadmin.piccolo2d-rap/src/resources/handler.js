@@ -25,7 +25,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		console.log("piccolo2djs....." + properties)
 		bindAll(this, [ "layout", "onReady", "onSend", "onRender"]);
 		this.parent = rap.getObject(properties.parent);
-		this.element = document.createElement("div");
+		this.element = document.createElement("canvas");
 		this.parent.append(this.element);
 		this.parent.addListener("Resize", this.layout);
 
@@ -65,8 +65,11 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				rap.off("render", this.onRender);
 
 				// Creates the graph inside the given container
-				
-
+				 var pCanvas = new PCanvas(this.element);
+				 
+				 var ptxt = new PText("Hello World");
+				 pCanvas.camera.layers[0].addChild(ptxt);
+				 
 				rap.on("send", this.onSend);
 
 				this.ready = true;

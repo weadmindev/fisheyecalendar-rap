@@ -40,6 +40,7 @@ public class Piccolo2dJS extends SVWidgetBase{
 	@Override
 	protected ArrayList<CustomRes> getCustomRes() {
 		ArrayList<CustomRes> res = new ArrayList<>();
+		res.add(new CustomRes("jquery.js", true, false));
 		res.add(new CustomRes("piccolo2d.js", true, false));
 		res.add(new CustomRes("handler.js", true, false));
 		return res;
