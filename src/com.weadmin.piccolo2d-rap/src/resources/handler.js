@@ -11,7 +11,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		},
 
 		destructor : "destroy",
-		methods : [],
+		methods : ['showText'],
 		properties : [ "size"],
 		events:[]
 
@@ -34,7 +34,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			height : 300
 		};
 		
-		
+		this._canvas = new PCanvas(this.element);
+		this._layer = this._canvas.camera.layers[0];
 
 		rap.on("render", this.onRender);
 	};
@@ -48,14 +49,6 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			// transparent explicitly
 			this.ready = true;
 			this.layout();
-			if (this._text) {
-				// this.setText( this._text );
-				delete this._text;
-			}
-			if (this._font) {
-				// this.setFont( this._font );
-				delete this._font;
-			}
 			console.log("piccolo2djs...onReady..")
 
 		},
@@ -63,12 +56,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		onRender : function() {
 			if (this.element.parentNode) {
 				rap.off("render", this.onRender);
-
-				// Creates the graph inside the given container
-				 var pCanvas = new PCanvas(this.element);
 				 
-				 var ptxt = new PText("Hello World");
-				 pCanvas.camera.layers[0].addChild(ptxt);
+				 
 				 
 				rap.on("send", this.onSend);
 
@@ -87,7 +76,10 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			//console.log("mxgraph...onSend..")
 		},
 
-		
+		showText:function(obj){
+			var ptxt = new PText(obj.text);
+			this._layer.addChild(ptxt);
+		},
 
 		setSize : function(size) {
 			if (this.ready) {

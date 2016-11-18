@@ -14,7 +14,13 @@ public class Piccolo2dJS extends SVWidgetBase{
 
 	public Piccolo2dJS(Composite parent, int style) {
 		super(parent, style);
-		// TODO Auto-generated constructor stub
+	}
+	
+	//show text
+	public void showText(String text){
+		JsonObject parameters = new JsonObject();
+		parameters.add("text", text);
+		super.callRemoteMethod("showText", parameters);
 	}
 
 	@Override
