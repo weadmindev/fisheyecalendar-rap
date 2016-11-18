@@ -12,7 +12,7 @@ public class ExampleOne extends AbstractEntryPoint{
 	protected void createContents(Composite parent) {
 		parent.setLayout(null);
 		Piccolo2dJS pjs = new Piccolo2dJS(parent, SWT.NONE);
-		pjs.setBounds(0, 0, 800, 600);
+		pjs.setBounds(200, 0, 1000, 600);
 	}
 
 }

@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 public class Piccolo2dJS extends SVWidgetBase{
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -7580109674486263430L;
 
@@ -19,17 +19,17 @@ public class Piccolo2dJS extends SVWidgetBase{
 
 	@Override
 	protected void handleSetProp(JsonObject properties) {
-		
+
 	}
 
 	@Override
 	protected void handleCallMethod(String method, JsonObject parameters) {
-		
+
 	}
 
 	@Override
 	protected void handleCallNotify(String event, JsonObject parameters) {
-		
+
 	}
 
 	@Override
@@ -40,6 +40,8 @@ public class Piccolo2dJS extends SVWidgetBase{
 	@Override
 	protected ArrayList<CustomRes> getCustomRes() {
 		ArrayList<CustomRes> res = new ArrayList<>();
+		res.add(new CustomRes("esl.js", true, false));
+		res.add(new CustomRes("zrender.js", true, false));
 		res.add(new CustomRes("piccolo2d.js", true, false));
 		res.add(new CustomRes("handler.js", true, false));
 		return res;
