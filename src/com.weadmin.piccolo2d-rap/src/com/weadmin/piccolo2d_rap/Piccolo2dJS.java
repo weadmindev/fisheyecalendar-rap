@@ -15,7 +15,7 @@ public class Piccolo2dJS extends SVWidgetBase{
 	public Piccolo2dJS(Composite parent, int style) {
 		super(parent, style);
 	}
-	
+
 	//show text
 	public void showText(String text){
 		JsonObject parameters = new JsonObject();
@@ -50,6 +50,7 @@ public class Piccolo2dJS extends SVWidgetBase{
 		res.add(new CustomRes("zrender.js", true, false));
 		res.add(new CustomRes("jquery.js", true, false));
 		res.add(new CustomRes("piccolo2d.js", true, false));
+		res.add(new CustomRes("fishEyeCalendar.js", true, false));
 		res.add(new CustomRes("handler.js", true, false));
 		return res;
 	}
