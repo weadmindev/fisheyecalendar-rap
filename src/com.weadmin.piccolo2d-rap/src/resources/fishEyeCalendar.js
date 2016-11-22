@@ -1,18 +1,12 @@
 // 鱼眼日历的插件
-;(function($, cxt){
+;(function(cxt){
 	var FishEyeCalendar = function(){
 	    this.init.apply(this, arguments);
 	};
 	FishEyeCalendar.prototype = {
 	    /** 可配置参数：
 	     *options: {
-	     		callback:function, // 删除成功后的回调函数。
-	     		dataTable:dataTable, //数据表格组件对象。
-	     		dataTablePagination:dataTablePagination, //分页组件对象。
-	     		deleteItemCls:deleteItemCls,  //单个形式删除的按钮的类名。
-	     		deleteAllCls:deleteAllCls, //批量形式删除的按钮的类名。
-	     		statusKey :"status", // 表示激活状态的字段，大多数情况下是status字段，如有特殊就传入。
-	     		parentKey :"xxx"    //status字段的父级字段。大多数情况是直接在第一级下的，如果又封装了一级，则要传入这个父级字段。
+
 	     	 }
 	     */
 	    init: function(options){
@@ -24,7 +18,7 @@
         this.boxWidthEnlargeRatio = 0.4;  //放大的方框的宽度所占比例。
         this.boxHeightEnlargeRatio = 0.3;  //放大的方框的高度所占比例。
         this.year = options.year || 2016;
-        this.month = options.month || 1;
+        this.month = options.month || 11;
         this.basePath = options.basePath;
         this.container = options.container;
         this.xStart = options.xStart || 10;  //整个图形的x起点。
@@ -58,20 +52,21 @@
       },
       initParamsConfig:function(){
         this.width = Math.ceil(this.zr.getWidth())-10;
-        this.height = Math.ceil(this.zr.getHeight())-10;
-        this.enlargeBoxWidth = this.boxWidthEnlargeRatio * this.width; //放大方框的宽度；
-        this.enlargeBoxHeight = this.boxHeightEnlargeRatio * this.height; //放大方框的高度；
+        this.height = Math.ceil(this.zr.getHeight())-50;
+        this.enlargeBoxWidth = (this.boxWidthEnlargeRatio * this.width); //放大方框的宽度；
+        this.enlargeBoxHeight = (this.boxHeightEnlargeRatio * this.height); //放大方框的高度；
 
-        this.xDivision = (this.width-this.xStart)/this.xBoxNum; //x轴分割成几份，每份的宽度。
-        this.yDivision = (this.height-this.yStart)/this.yBoxNum; //y轴分割成几份，每份的高度。
+        this.xDivision = ((this.width-this.xStart)/this.xBoxNum); //x轴分割成几份，每份的宽度。
+        this.yDivision = ((this.height-this.yStart)/this.yBoxNum); //y轴分割成几份，每份的高度。
         //有方框被放大时，x轴剩余宽度分割成n-1份，每份的宽度。
-        this.xDivisionHasEnlarge = (this.width-this.enlargeBoxWidth-this.xStart)/this.xBoxNum;
-        this.yDivisionHasEnlarge = (this.height-this.enlargeBoxHeight-this.xStart)/this.yBoxNum; //y轴剩余高度分割成n-1份，每份的高度。
+        this.xDivisionHasEnlarge = ((this.width-this.enlargeBoxWidth-this.xStart)/this.xBoxNum);
+        this.yDivisionHasEnlarge = ((this.height-this.enlargeBoxHeight-this.yStart)/this.yBoxNum); //y轴剩余高度分割成n-1份，每份的高度。
 				this.headerTextList = []; //日历头的表示星期几的文本。
 				this.colLineShapeList = []; //竖线条对象列表。
         this.rowLineShapeList = []; //横着的线条对象列表。
         this.boxNumTextList = []; //每个小方框左上角的数值对象。 二维数组
         this.leftTopPointArr = []; //每个小方框左上角的坐标点。 二维数组
+				this.numBoxRectangleList = []; //
 
 				this.monthDays = this.getSumDaysOfMonth(this.year,this.month); //得到某个月有多少天。
         this.firstDayWeekIndex = this.getWeekDayByDate(this.year,this.month,1); //获取某个月的第一天是星期几。
@@ -96,12 +91,17 @@
                 var zr=_this.zr,xBoxNum = _this.xBoxNum, yBoxNum = _this.yBoxNum;
                 var xStart=_this.xStart,yStart=_this.yStart;
                 _this.initParamsConfig();
-                // _this.drawRectangleContainer(zr,RectangleShape,{x:xStart,y:yStart,width:(width-20),height:(height-20)});
                 _this.initAllLineShape(); //初始化网格线条
-                _this.initBoxNumShape(); // 初始化小方框里的数值。
+                _this.initBoxNumShape(); // 初始化小方框里的数值
+								console.log("leftTopPointArr0000:",_this.leftTopPointArr);
 								_this.initCalendarHeader(); //初始化日历的头，就是星期日到星期六
 
-                console.log("leftTopPointArr:",_this.leftTopPointArr);
+								//init the box that has number text, and add a rectangle over it.
+								for(var i=0;i<31;i++){ //one month has 31 days at most.
+									_this.numBoxRectangleList[i] = _this.drawRectangleShape({x:-100,y:-100,width:1,height:1});
+									_this.zr.addShape(_this.numBoxRectangleList[i]);
+								}
+								_this.refreshHasNumBoxRectangleShape(false);
 								_this.addEvent();
 								// 最后开始渲染画布。
                 _this.zr.render(function(){
@@ -129,38 +129,24 @@
 			},
       initAllLineShape:function(){
         for(var i = 0; i <= this.xBoxNum; i++) { //画竖线。变的是x轴方向的坐标
-            var boxXStart = this.getBoxXStart(i);
-            this.colLineShapeList[i] = new this.LineShape({
-                id : this.guid(),
-                style : {
-                  xStart:boxXStart,
-                  yStart:this.yStart,
-                  xEnd:boxXStart,
-                  yEnd:this.height,
-                  strokeColor: this.color.getColor(8),
-                  lineType :'solid',
-                  zlevel:1,
-                  lineWidth:1
-                }
-            });
+            var boxXStart = (this.getBoxXStart(i));
+            this.colLineShapeList[i] = this.drawLineShape({
+							xStart:boxXStart,
+							yStart:this.yStart,
+							xEnd:boxXStart,
+							yEnd:this.height
+						});
             this.zr.addShape(this.colLineShapeList[i]);
         }
         for(var i = 0; i <= this.yBoxNum; i++) { //画横线。变的是y轴方向的坐标
-          var boxYStart = this.getBoxYStart(i);
-            this.rowLineShapeList[i] = new this.LineShape({
-                id : this.guid(),
-                style : {
-                  xStart:this.xStart,
-                  yStart:boxYStart,
-                  xEnd:this.width,
-                  yEnd:boxYStart,
-                  strokeColor: this.color.getColor(8),
-                  lineType :'solid',
-                  zlevel:1,
-                  lineWidth:1
-                }
-            });
-            this.zr.addShape(this.rowLineShapeList[i]);
+          var boxYStart = (this.getBoxYStart(i));
+					this.rowLineShapeList[i] = this.drawLineShape({
+						xStart:this.xStart,
+						yStart:boxYStart,
+						xEnd:this.width,
+						yEnd:boxYStart
+					});
+          this.zr.addShape(this.rowLineShapeList[i]);
         }
       },
       initBoxNumShape:function(){ //画小方框左上角的数值
@@ -169,20 +155,22 @@
           this.leftTopPointArr.push([]);
           this.boxNumTextList.push([]);
           for(j=0;j< this.xBoxNum;j++){ //这是列坐标。
-            var xPoint = this.getBoxXStart(j);
-            var yPoint = this.getBoxYStart(i);
+            var xPoint = (this.getBoxXStart(j));
+            var yPoint = (this.getBoxYStart(i));
 						var text = this.getBoxNumText(i,j,days);
 						days = text ? text : days;
             this.leftTopPointArr[i][j] = {x:xPoint, y:yPoint, text:text};
-            this.boxNumTextList[i][j] = this.drawTextShape({x:xPoint+5, y:yPoint+10, text:text });
+            this.boxNumTextList[i][j] = this.drawTextShape({x:xPoint+10, y:yPoint+12, text:text });
             this.zr.addShape(this.boxNumTextList[i][j]);
           }
         }
         console.log("leftTopPointArr",this.leftTopPointArr);
         console.log("boxNumTextList",this.boxNumTextList);
       },
+
       addEvent:function(){
 				var _this = this;
+
 				// 全局事件,当点击了画布上的某个点时。把点击的坐标点所在的小方框放大或点击的是已经放大的则复原。
 				this.zr.on('click', function(params) {
 					console.log('Hello, zrender onClick event obj:',params);
@@ -201,59 +189,16 @@
 					}
 					console.log("clickXIndex:",clickXIndex);
 					console.log("clickYIndex:",clickYIndex);
-					if(clickXIndex == _this.enlargeBox.xIndex && clickYIndex == _this.enlargeBox.yIndex){ //判断是否是点击的当前正在放大的那个方框
-						_this.enlargeBox.xIndex = -1;
-						_this.enlargeBox.yIndex = -1;
-					}else{
-						_this.enlargeBox.xIndex = clickXIndex;
-						_this.enlargeBox.yIndex = clickYIndex;
+					if(!_this.leftTopPointArr[clickXIndex][clickYIndex]['text']){
+						return;
 					}
-					// 更新图形参数。
-					for(i = 0; i <= _this.xBoxNum; i++){ // 更新纵线的坐标；
-						var boxXStart = _this.getBoxXStart(i);
-						var colLine = _this.colLineShapeList[i];
-						_this.zr.animate(colLine.id,'style').when(500,{
-							xStart:boxXStart,
-							xEnd:boxXStart
-						}).start();
-					}
-					for(i = 0; i <= _this.yBoxNum; i++){
-						// 更新横线的坐标：
-						var boxYStart = _this.getBoxYStart(i);
-						var rowLine = _this.rowLineShapeList[i];
-						_this.zr.animate(rowLine.id,'style').when(500,{
-							yStart:boxYStart,
-							yEnd:boxYStart
-						}).start();
-					}
+					_this.setEnlargeBoxIndex(clickXIndex,clickYIndex);
 					// 跟新数值的坐标
-					var days = 0,text='';
-					for(i = 0; i < _this.yBoxNum; i++) {
-						for(var j=0;j< _this.xBoxNum;j++){ //这是列坐标。
-							var xPoint = _this.getBoxXStart(j);
-							var yPoint = _this.getBoxYStart(i);
-							var text = _this.getBoxNumText(i,j,days);
-							days = text ? text : days;
-							// var text = i*(xBoxNum) + j+1;
-							_this.leftTopPointArr[i][j]['x'] = xPoint;
-							_this.leftTopPointArr[i][j]['y'] = yPoint;
-							var boxNumText = _this.boxNumTextList[i][j];
-							_this.zr.animate(boxNumText.id,'style').when(500,{
-								x:xPoint+5,
-								y:yPoint+10
-							}).start();
-						}
-					}
-					//
-					var firstRowPointArr = _this.leftTopPointArr[0];
-					for(i = 0; i < firstRowPointArr.length; i++){
-						var endPoint = (i==firstRowPointArr.length-1) ? _this.width : firstRowPointArr[i+1]['x'];
-						var offsetX = (endPoint-firstRowPointArr[i]['x'])/2;
-						var xPoint = firstRowPointArr[i]['x'] + offsetX;
-						_this.zr.animate(_this.headerTextList[i].id,'style').when(500,{
-							x:xPoint
-						}).start();
-					}
+					_this.refreshTextShape(false);
+					// 更新图形参数。
+					_this.refreshLineShape();
+					_this.refreshHasNumBoxRectangleShape(true);
+					// _this.zr.refresh();
 				});
       },
 			getBoxNumText:function(i,j,days){ //得到每个小方框里的数值。会根据这个月有多少天，1号是星期几。
@@ -262,6 +207,15 @@
 					text = days+1;
 				}
 				return text;
+			},
+			setEnlargeBoxIndex:function(xIndex,yIndex){ //set the xIndex and yIndex of being enlarged box
+				if(xIndex == this.enlargeBox.xIndex && yIndex == this.enlargeBox.yIndex){ //判断是否是点击的当前正在放大的那个方框
+					this.enlargeBox.xIndex = -1;
+					this.enlargeBox.yIndex = -1;
+				}else{
+					this.enlargeBox.xIndex = xIndex;
+					this.enlargeBox.yIndex = yIndex;
+				}
 			},
       hasEnlargeBox:function(){ //当前是否有放大的方框
         return (this.enlargeBox.xIndex >= 0 && this.enlargeBox.yIndex >= 0) ? true : false;
@@ -292,8 +246,173 @@
         }
         return boxYStart;
       },
+			refreshLineShape:function(){
+				var _this = this;
+				for(var i = 0; i <= this.xBoxNum; i++){ // 更新纵线的坐标；
+					var boxXStart = (this.getBoxXStart(i));
+					var colLine = this.colLineShapeList[i];
+					(function(boxXStart,colLine){
+						setTimeout(function(){
+							_this.zr.animate(colLine.id,'style').when(500,{
+								xStart:boxXStart,
+								xEnd:boxXStart
+							}).start();
+						},10);
+					})(boxXStart,colLine);
+				}
+				for(var i = 0; i <= this.yBoxNum; i++){ // 更新横线的坐标：
+					var boxYStart = (this.getBoxYStart(i));
+					var rowLine = this.rowLineShapeList[i];
+					(function(boxYStart,rowLine){
+						setTimeout(function(){
+							_this.zr.animate(rowLine.id,'style').when(500,{
+								yStart:boxYStart,
+								yEnd:boxYStart
+							}).start();
+						},10);
+					})(boxYStart,rowLine);
+				}
+			},
+			refreshTextShape:function(isNeedChangeNumText){
+				var _this = this;
+				var i=0, j=0, days=0, text='';
+				for(i = 0; i < this.yBoxNum; i++) {
+					for(var j=0;j< this.xBoxNum;j++){ //这是列坐标。
+						var xPoint = (this.getBoxXStart(j));
+						var yPoint = (this.getBoxYStart(i));
+						var text = this.getBoxNumText(i,j,days);
+						days = text ? text : days;
+						this.leftTopPointArr[i][j]['x'] = xPoint;
+						this.leftTopPointArr[i][j]['y'] = yPoint;
+						this.leftTopPointArr[i][j]['text'] = text;
+						var boxNumText = this.boxNumTextList[i][j];
+						if(isNeedChangeNumText){
+							boxNumText.style.text = text;
+							this.zr.modShape(boxNumText.id, boxNumText);
+						}
+						(function(xPoint,yPoint,boxNumText){
+							setTimeout(function(){
+								_this.zr.animate(boxNumText.id,'style').when(500,{
+									x:xPoint+10,
+									y:yPoint+12
+								}).start();
+							},10);
+						})(xPoint,yPoint,boxNumText);
+					}
+				}
+				//refresh calendar header's position of week text.
+				var firstRowPointArr = this.leftTopPointArr[0];
+				for(i = 0; i < firstRowPointArr.length; i++){
+					var endPoint = (i==firstRowPointArr.length-1) ? this.width : firstRowPointArr[i+1]['x'];
+					var offsetX = (endPoint-firstRowPointArr[i]['x'])/2;
+					var xPoint = firstRowPointArr[i]['x'] + offsetX;
+					this.zr.animate(this.headerTextList[i].id,'style').when(500,{
+						x:xPoint
+					}).start();
+				}
+				isNeedChangeNumText ? this.zr.refresh() : null;
+			},
+			refreshHasNumBoxRectangleShape:function(isNeedAnimation){
+				var _this = this;
+				var rowNum = this.leftTopPointArr.length;
+				var colNum = this.leftTopPointArr[0].length;
+				for(var i=0;i<rowNum;i++){
+					var rowList = this.leftTopPointArr[i];
+					var curPointY = this.leftTopPointArr[i][0]['y'];
+					var nextPointY = (i==rowNum-1) ? this.height : this.leftTopPointArr[i+1][0]['y']; //next Y point coordinate
+					for(var j=0;j<colNum;j++){
+						var curPointX = rowList[j]['x']; //current X point coordinate.
+						var nextPointX = (j==colNum-1) ? this.width : rowList[j+1]['x']; //next X point coordinate.
+						if(rowList[j]['text']){
+							var boxRectangleShape = this.numBoxRectangleList[rowList[j]['text']-1];
+							if(isNeedAnimation){
+								(function(curPointX,curPointY,nextPointX,nextPointY,boxRectangleShape){
+									setTimeout(function(){
+										_this.zr.animate(boxRectangleShape.id,'style').when(500,{
+											x:curPointX,
+											y:curPointY,
+											width:nextPointX - curPointX,
+											height:nextPointY - curPointY
+										}).start();
+									},10);
+								})(curPointX,curPointY,nextPointX,nextPointY,boxRectangleShape);
+							}else{
+								boxRectangleShape.style.x = curPointX;
+								boxRectangleShape.style.y = curPointY;
+								boxRectangleShape.style.width = nextPointX - curPointX;
+								boxRectangleShape.style.height = nextPointY - curPointY;
+							}
+						}
+					}
+				}
+				// if(isNeedAnimation){
+				// 	for(var j=this.monthDays;j<31;j++){
+				// 		this.zr.animate(this.numBoxRectangleList[j].id,'style').when(1,{
+				// 			x:-100,
+				// 			y:-100,
+				// 			width:1,
+				// 			height:1
+				// 		}).start();
+				// 	}
+				// }
+			},
+			refreshShapeByYearMonth:function(year,month){  //change the calendar shape by change the year or month.
+				var _this = this;
+				this.year = +year;
+				this.month = +month;
+				this.enlargeBox.xIndex = -1;
+				this.enlargeBox.yIndex = -1;
+				this.monthDays = this.getSumDaysOfMonth(this.year,this.month);
+        this.firstDayWeekIndex = this.getWeekDayByDate(this.year,this.month,1);
+				this.refreshLineShape();
+				this.refreshTextShape(true);
+				// this.refreshHasNumBoxRectangleShape(false);
+				var rowNum = this.leftTopPointArr.length;
+				var colNum = this.leftTopPointArr[0].length;
+				for(var i=0;i<31;i++){ //one month has 31 days at most.
+					_this.zr.delShape(_this.numBoxRectangleList[i].id);
+					_this.numBoxRectangleList[i] = _this.drawRectangleShape({x:-100,y:-100,width:1,height:1});
+					_this.zr.addShape(_this.numBoxRectangleList[i]);
+				}
+				for(var i=0;i<rowNum;i++){
+					var rowList = this.leftTopPointArr[i];
+					var curPointY = this.leftTopPointArr[i][0]['y'];
+					var nextPointY = (i==rowNum-1) ? this.height : this.leftTopPointArr[i+1][0]['y']; //next Y point coordinate
+					for(var j=0;j<colNum;j++){
+						var curPointX = rowList[j]['x']; //current X point coordinate.
+						var nextPointX = (j==colNum-1) ? this.width : rowList[j+1]['x']; //next X point coordinate.
+						if(rowList[j]['text']){
+							var boxRectangleShape = this.numBoxRectangleList[rowList[j]['text']-1];
+							boxRectangleShape.style.x = curPointX;
+							boxRectangleShape.style.y = curPointY;
+							boxRectangleShape.style.width = nextPointX - curPointX;
+							boxRectangleShape.style.height = nextPointY - curPointY;
+							_this.zr.modShape(_this.numBoxRectangleList[i].id, _this.numBoxRectangleList[i]);
+						}
+					}
+				}
+				this.zr.refresh();
+			},
+
+			// draw the base line shape.
+			drawLineShape:function(config){
+				return new this.LineShape({
+						id : this.guid(),
+						style : {
+							xStart:config.xStart,
+							yStart:config.yStart,
+							xEnd:config.xEnd,
+							yEnd:config.yEnd,
+							strokeColor: this.color.getColor(5),
+							lineType :'solid',
+							zlevel:1,
+							lineWidth:1
+						}
+				});
+			},
       drawTextShape:function(config){
         return new this.TextShape({
+					hoverable : false,
           style:{
             x:config.x,
             y:config.y,
@@ -303,30 +422,54 @@
 						textFont:config.textFont||null,
             textBaseLine:'bottom'
           },
-          highlightStyle:{
-            opacity:0
-          },
-          hoverable:true,
+          // hoverable:true,
           zlevel:2
         });
       },
-      drawRectangleContainer:function(config){
-        // 矩形
-        this.zr.addShape(new this.RectangleShape({
+      drawRectangleShape:function(config){
+				var _this=this;
+				return new this.RectangleShape({
+					clickable : true,
+					// hoverable:false,
             style : {
                 x : config.x,
                 y : config.y,
                 width : config.width,
                 height: config.height,
-                // brushType : 'both',
-                color : 'white',
-                // strokeColor : color.getColor(colorIdx++),
-                // lineWidth : 1,
+								text:config.text,
+                brushType : 'stroke',
+                // color : 'white',
+								lineWidth : 1,
+                strokeColor : '#7848F1',
                 // lineJoin : 'round',
-                zlevel:0
+                zlevel:3
             },
+						highlightStyle:{
+							shadowBlur:1,
+							shadowColor:'#DAA520',
+							lineWidth : 0.7,
+	            strokeColor : '#FFD700'
+	          },
+						// onmouseover: function(param) {
+				    //     _this.zr.addHoverShape(new _this.RectangleShape({
+				    //         style: {
+						// 					x:0,
+						// 					y:0,
+						// 					brushType : 'stroke',
+						// 					lineWidth : 0.8,
+						// 					strokeColor : '#FFD700',
+						// 					zlevel:4
+				    //         },
+						// 				highlightStyle:{
+						// 					shadowBlur:1,
+						// 					shadowColor:'#DAA520',
+						// 					lineWidth : 0.7,
+					  //           strokeColor : '#FFD700'
+					  //         }
+				    //     }));
+				    // },
             draggable : false
-        }));
+        });
       },
       //根据某年某月某日算出这天是星期几。每周从周日开始，索引index为0.
       getWeekDayByDate:function(year,month,day){
@@ -337,11 +480,11 @@
         }else{
           m = month;
         }
-        y = parseInt(year%100);
-        c = parseInt(year/100);
+        y = (year%100);
+        c = (year/100);
         d = day;
-        w=y+parseInt(y/4)+parseInt(c/4)-2*c+parseInt(26*(m+1)/10)+d-1;
-        return (w%7);
+        w=y+(y/4)+(c/4)-2*c+(26*(m+1)/10)+d-1;
+        return w<0 ? (7+w) : (w%7);
       },
       getSumDaysOfMonth:function(year,month){ //获取某年某月的当月总天数。
         var  tempDate = new Date(year,month,0);
@@ -350,4 +493,4 @@
 
 	};
 	cxt.FishEyeCalendar = FishEyeCalendar;
-})(jQuery, window);
+})(window);

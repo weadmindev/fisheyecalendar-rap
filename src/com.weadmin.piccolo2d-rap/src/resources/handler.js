@@ -65,6 +65,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				rap.off("render", this.onRender);
 				// Creates the graph inside the given container
 				this.fishEyeCalendar = new FishEyeCalendar({
+					year:2016,
+					month:11,
 					basePath:PICCOLO2D_BASEPATH,
 					container:_this.element
 				});
@@ -85,6 +87,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			//console.log("mxgraph...onSend..")
 		},
 		addCalendarHeader:function(parent){ //增加日历头
+			var that = this;
 			var ele = document.createElement('div');
 			var $ele = $(ele);
 			$ele.append("<span>年：</span><select class='calendarYear'>\
@@ -94,7 +97,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				<option value='2016'>2016</option>\
 				<option value='2017'>2017</option>\
         <option value='2018'>2018</option>\
-      </select><span>月：</span><select class='calendarMonth'>\
+      </select><span>  月：</span><select class='calendarMonth'>\
         <option value='1'>1</option>\
 				<option value='2'>2</option>\
 				<option value='3'>3</option>\
@@ -108,13 +111,16 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				<option value='11'>11</option>\
         <option value='12'>12</option>\
       </select>");
+			$ele.find('.calendarYear').val(2016);
+			$ele.find('.calendarMonth').val(11);
 			$ele.on('change','.calendarYear',function(){
 				var $this = $(this);
 				console.log("selected calendar year:",$this.val());
-
+				that.fishEyeCalendar.refreshShapeByYearMonth($this.val(),$this.closest('div').find('.calendarMonth').val());
 			});
 			$ele.on('change','.calendarMonth',function(){
-
+				var $this = $(this);
+				that.fishEyeCalendar.refreshShapeByYearMonth($this.closest('div').find('.calendarYear').val(),$this.val());
 			});
 			parent.append($ele[0]);
 		},
