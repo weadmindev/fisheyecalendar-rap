@@ -26,7 +26,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		bindAll(this, [ "layout", "onReady", "onSend", "onRender"]);
 		this.parent = rap.getObject(properties.parent);
     console.log("this.parent:",this.parent);
-		this.addCalendarHeader(this.parent);
+		// this.addCalendarHeader(this.parent);
 		this.element = document.createElement("div");
 		this.canvasElement = document.createElement("canvas");
 		this.parent.append(this.element);
@@ -40,22 +40,30 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		this.element.style.width = this._size.width+"px";
     this.element.style.height = (this._size.height-20)+"px";
 
+		// calendar chart container
+		this.fishEyeContainer = document.createElement('div');
+		this.fishEyeContainer.style.width = "100%";
+		this.fishEyeContainer.style.height = "100%";
+		this.element.appendChild(this.fishEyeContainer);
+		//
+		this.detailChartContainer = document.createElement('div');
+		// this.detailChartContainer.style.width = "100%";
+		// this.detailChartContainer.style.height = "100%";
+		this.element.appendChild(this.detailChartContainer);
+
 		this._canvas = new PCanvas(this.canvasElement);
 		this._layer = this._canvas.camera.layers[0];
 
 		rap.on("render", this.onRender);
 	};
-
 	eclipsesource.piccolo2djs.prototype = {
-
 		ready : false,
-
 		onReady : function() {
 			// TODO [tb] : on IE 7/8 the iframe and body has to be made
 			// transparent explicitly
 			this.ready = true;
 			this.layout();
-			console.log("piccolo2djs...onReady..")
+			console.log("piccolo2djs...onReady..");
 
 		},
 
@@ -66,9 +74,10 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				// Creates the graph inside the given container
 				this.fishEyeCalendar = new FishEyeCalendar({
 					year:2016,
-					month:11,
+					month:10,
 					basePath:PICCOLO2D_BASEPATH,
-					container:_this.element
+					container:_this.fishEyeContainer,
+					detailContainer:this.detailChartContainer
 				});
         /////////////////////
 				rap.on("send", this.onSend);
@@ -112,7 +121,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
         <option value='12'>12</option>\
       </select>");
 			$ele.find('.calendarYear').val(2016);
-			$ele.find('.calendarMonth').val(11);
+			$ele.find('.calendarMonth').val(10);
 			$ele.on('change','.calendarYear',function(){
 				var $this = $(this);
 				console.log("selected calendar year:",$this.val());

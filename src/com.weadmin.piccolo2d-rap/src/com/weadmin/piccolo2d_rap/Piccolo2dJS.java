@@ -49,7 +49,9 @@ public class Piccolo2dJS extends SVWidgetBase{
 		res.add(new CustomRes("esl.js", true, false));
 		res.add(new CustomRes("zrender.js", true, false));
 		res.add(new CustomRes("jquery.js", true, false));
+		res.add(new CustomRes("echarts.simple.js", true, false));
 		res.add(new CustomRes("piccolo2d.js", true, false));
+		res.add(new CustomRes("detailCharts.js", true, false));
 		res.add(new CustomRes("fishEyeCalendar.js", true, false));
 		res.add(new CustomRes("handler.js", true, false));
 		return res;
