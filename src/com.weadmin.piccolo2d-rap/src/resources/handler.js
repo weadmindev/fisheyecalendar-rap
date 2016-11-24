@@ -74,7 +74,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				// Creates the graph inside the given container
 				this.fishEyeCalendar = new FishEyeCalendar({
 					year:2016,
-					month:10,
+					month:11,
 					basePath:PICCOLO2D_BASEPATH,
 					container:_this.fishEyeContainer,
 					detailContainer:this.detailChartContainer

@@ -1,34 +1,35 @@
-// 鱼眼日历的插件
+// fish eye calendar component
 ;(function(cxt){
 	var FishEyeCalendar = function(){
 	    this.init.apply(this, arguments);
 	};
 	FishEyeCalendar.prototype = {
-	    /** 可配置参数：
+	    /**
 	     *options: {
 
 	     	 }
 	     */
 	    init: function(options){
-        this.zr = null; //zrender实例对象。
+        this.zr = null;
         this.width=0;
         this.height=0;
-        this.xBoxNum = 7; //x方向被分割的小方块的个数。就是一个星期的天数。
-        this.yBoxNum = 6;  //y方向被分割的小方块的个数。一个月最多可以占几行。
-        this.boxWidthEnlargeRatio = 0.4;  //放大的方框的宽度所占比例。
-        this.boxHeightEnlargeRatio = 0.3;  //放大的方框的高度所占比例。
+        this.xBoxNum = 7; //the number of days of one week.
+        this.yBoxNum = 6;  //the number of row of one month.
+        this.boxWidthEnlargeRatio = 0.5;
+        this.boxHeightEnlargeRatio = 0.5;
         this.year = options.year || 2016;
         this.month = options.month || 11;
         this.basePath = options.basePath;
 				this.container = options.container;
         this.detailContainer = options.detailContainer; //dom container of detail chart
-        this.xStart = options.xStart || 10;  //整个图形的x起点。
-        this.yStart = options.yStart || 50; //整个图形的y起点
-        this.enlargeBox = {xIndex:-1,yIndex:-1}; //放大的小方框的坐标索引。为-1表示没有一个方框放大
-				this.animationTime = 200; // millisecond.
+        this.xStart = options.xStart || 10;  //鏁翠釜鍥惧舰鐨剎璧风偣銆�
+        this.yStart = options.yStart || 50; //鏁翠釜鍥惧舰鐨剏璧风偣
+        this.enlargeBox = {xIndex:-1,yIndex:-1}; //鏀惧ぇ鐨勫皬鏂规鐨勫潗鏍囩储寮曘�備负-1琛ㄧず娌℃湁涓�涓柟妗嗘斁澶�
+				this.animationTime = 500; // millisecond.
 				this.isAnimating = false;
-				this.echarts = null;
+				this.echarts = null;  //
 				this.detailCurveCharts = null;
+				this.todayDate = new Date();
         this.initPathsConfig();
         this.initElement();
 	    },
@@ -37,8 +38,12 @@
         require.config({
             paths:{
 							zrender:this.basePath+'zrender',
-							echarts:this.basePath+'echarts.simple',
-                'echarts/component/tooltip':this.basePath+'echarts.simple',
+							echarts:this.basePath+'echarts.min',
+                'echarts/component/tooltip':this.basePath+'echarts.min',
+								'echarts/chart/line':this.basePath+'echarts.min',
+								'echarts/component/legend':this.basePath+'echarts.min',
+								'echarts/component/grid':this.basePath+'echarts.min',
+								'echarts/component/dataZoomInside':this.basePath+'echarts.min',
                 'zrender/shape/Rectangle' : this.basePath+'zrender',
                 'zrender/shape/Line' : this.basePath+'zrender',
                 'zrender/shape/Text' : this.basePath+'zrender'
@@ -60,27 +65,28 @@
       initParamsConfig:function(){
         this.width = Math.ceil(this.zr.getWidth())-10;
         this.height = Math.ceil(this.zr.getHeight())-50;
-        this.enlargeBoxWidth = (this.boxWidthEnlargeRatio * this.width); //放大方框的宽度；
-        this.enlargeBoxHeight = (this.boxHeightEnlargeRatio * this.height); //放大方框的高度；
+        this.enlargeBoxWidth = (this.boxWidthEnlargeRatio * this.width); //鏀惧ぇ鏂规鐨勫搴︼紱
+        this.enlargeBoxHeight = (this.boxHeightEnlargeRatio * this.height); //鏀惧ぇ鏂规鐨勯珮搴︼紱
 
-        this.xDivision = ((this.width-this.xStart)/this.xBoxNum); //x轴分割成几份，每份的宽度。
-        this.yDivision = ((this.height-this.yStart)/this.yBoxNum); //y轴分割成几份，每份的高度。
-        //有方框被放大时，x轴剩余宽度分割成n-1份，每份的宽度。
+        this.xDivision = ((this.width-this.xStart)/this.xBoxNum); //x杞村垎鍓叉垚鍑犱唤锛屾瘡浠界殑瀹藉害銆�
+        this.yDivision = ((this.height-this.yStart)/this.yBoxNum); //y杞村垎鍓叉垚鍑犱唤锛屾瘡浠界殑楂樺害銆�
+        //鏈夋柟妗嗚鏀惧ぇ鏃讹紝x杞村墿浣欏搴﹀垎鍓叉垚n-1浠斤紝姣忎唤鐨勫搴︺��
         this.xDivisionHasEnlarge = ((this.width-this.enlargeBoxWidth-this.xStart)/this.xBoxNum);
-        this.yDivisionHasEnlarge = ((this.height-this.enlargeBoxHeight-this.yStart)/this.yBoxNum); //y轴剩余高度分割成n-1份，每份的高度。
-				this.headerTextList = []; //日历头的表示星期几的文本。
-				this.colLineShapeList = []; //竖线条对象列表。
-        this.rowLineShapeList = []; //横着的线条对象列表。
-        this.boxNumTextList = []; //每个小方框左上角的数值对象。 二维数组
-        this.leftTopPointArr = []; //每个小方框左上角的坐标点。 二维数组
+        this.yDivisionHasEnlarge = ((this.height-this.enlargeBoxHeight-this.yStart)/this.yBoxNum); //y杞村墿浣欓珮搴﹀垎鍓叉垚n-1浠斤紝姣忎唤鐨勯珮搴︺��
+				this.headerTextList = []; //鏃ュ巻澶寸殑琛ㄧず鏄熸湡鍑犵殑鏂囨湰銆�
+				this.colLineShapeList = []; //绔栫嚎鏉″璞″垪琛ㄣ��
+        this.rowLineShapeList = []; //妯潃鐨勭嚎鏉″璞″垪琛ㄣ��
+        this.boxNumTextList = []; //姣忎釜灏忔柟妗嗗乏涓婅鐨勬暟鍊煎璞°�� 浜岀淮鏁扮粍
+        this.leftTopPointArr = []; //姣忎釜灏忔柟妗嗗乏涓婅鐨勫潗鏍囩偣銆� 浜岀淮鏁扮粍
 				this.numBoxRectangleList = []; //
 
-				this.monthDays = this.getSumDaysOfMonth(this.year,this.month); //得到某个月有多少天。
-        this.firstDayWeekIndex = this.getWeekDayByDate(this.year,this.month,1); //获取某个月的第一天是星期几。
+				this.monthDays = this.getSumDaysOfMonth(this.year,this.month); //the total number of days of one month.
+        this.firstDayWeekIndex = this.getWeekDayByDate(this.year,this.month,1); //the first day of one month is day of the week.
+				this.todayIndex = (this.todayDate.getFullYear() == this.year && this.todayDate.getMonth()==this.month-1) ? this.todayDate.getDate()-1 : -1;
 
 				this.detailContainer.setAttribute('id','detailChartContainers');
 				this.detailContainer.style.position = 'absolute';
-				this.detailContainer.style.border = 'solid 2px red';
+				this.detailContainer.style.border = 'solid 1px #7848F1';
 				this.detailContainer.style.width = (this.width-10)+'px';
 				this.detailContainer.style.height = (this.height-50)+'px';
 				this.detailContainer.style.left = this.xStart+'px';
@@ -93,11 +99,10 @@
             'zrender/shape/Line',
             'zrender/shape/Text',
 						'echarts',
-            // 'echarts/chart/line',
-            // 'echarts/component/legend',
-            // 'echarts/component/grid',
+            'echarts/chart/line',
+            'echarts/component/legend',
+            'echarts/component/grid',
             'echarts/component/tooltip'
-                // 'echarts/component/dataZoomInside'
           ],function(zrender,RectangleShape,LineShape,TextShape,echarts) {
 								_this.echarts = echarts;
                 _this.zr = zrender.init(_this.container);
@@ -114,17 +119,17 @@
                 var xStart=_this.xStart,yStart=_this.yStart;
                 _this.initParamsConfig();
 
-                _this.initAllLineShape(); //初始化网格线条
-                _this.initBoxNumShape(); // 初始化小方框里的数值
+                // _this.initAllLineShape(); //鍒濆鍖栫綉鏍肩嚎鏉�
+                _this.initBoxNumShape(); // 鍒濆鍖栧皬鏂规閲岀殑鏁板��
 								console.log("leftTopPointArr0000:",_this.leftTopPointArr);
-								_this.initCalendarHeader(); //初始化日历的头，就是星期日到星期六
+								_this.initCalendarHeader(); //鍒濆鍖栨棩鍘嗙殑澶达紝灏辨槸鏄熸湡鏃ュ埌鏄熸湡鍏�
 
 								//init the box that has number text, and add a rectangle over it.
-								for(var i=0;i<31;i++){ //one month has 31 days at most.
-									_this.numBoxRectangleList[i] = _this.drawRectangleShape({x:-100,y:-100,width:1,height:1});
-									_this.zr.addShape(_this.numBoxRectangleList[i]);
-								}
-								_this.refreshHasNumBoxRectangleShape(false);
+								// for(var i=0;i<31;i++){ //one month has 31 days at most.
+								// 	_this.numBoxRectangleList[i] = _this.drawRectangleShape({x:-100,y:-100,width:1,height:1});
+								// 	_this.zr.addShape(_this.numBoxRectangleList[i]);
+								// }
+								// _this.refreshHasNumBoxRectangleShape(false);
 								_this.detailCurveCharts = new DetailCurveCharts({
 										xStart:_this.xStart,
 										yStart:_this.yStart,
@@ -132,13 +137,15 @@
 										height:_this.height,
 										echarts:echarts,
 										container:_this.detailContainer,
+										enlargeBox:_this.enlargeBox,
+										todayIndex:_this.todayIndex,
 										refreshAllOnClick:function(clickXIndex,clickYIndex){
 											_this.refreshAllOnClick(clickXIndex,clickYIndex);
 										}
 									});
-								_this.detailCurveCharts.setPosition(_this.leftTopPointArr);
+								_this.detailCurveCharts.setPosition(_this.leftTopPointArr,true);
 								_this.addEvent();
-								// 最后开始渲染画布。
+								// 鏈�鍚庡紑濮嬫覆鏌撶敾甯冦��
                 _this.zr.render(function(){
                   // after render callback!!
                 });
@@ -163,7 +170,7 @@
 				}
 			},
       initAllLineShape:function(){
-        for(var i = 0; i <= this.xBoxNum; i++) { //画竖线。变的是x轴方向的坐标
+        for(var i = 0; i <= this.xBoxNum; i++) { //鐢荤珫绾裤�傚彉鐨勬槸x杞存柟鍚戠殑鍧愭爣
             var boxXStart = (this.getBoxXStart(i));
             this.colLineShapeList[i] = this.drawLineShape({
 							xStart:boxXStart,
@@ -173,7 +180,7 @@
 						});
             this.zr.addShape(this.colLineShapeList[i]);
         }
-        for(var i = 0; i <= this.yBoxNum; i++) { //画横线。变的是y轴方向的坐标
+        for(var i = 0; i <= this.yBoxNum; i++) { //鐢绘í绾裤�傚彉鐨勬槸y杞存柟鍚戠殑鍧愭爣
           var boxYStart = (this.getBoxYStart(i));
 					this.rowLineShapeList[i] = this.drawLineShape({
 						xStart:this.xStart,
@@ -184,19 +191,19 @@
           this.zr.addShape(this.rowLineShapeList[i]);
         }
       },
-      initBoxNumShape:function(){ //画小方框左上角的数值
+      initBoxNumShape:function(){ //鐢诲皬鏂规宸︿笂瑙掔殑鏁板��
         var i=0,j=0,days=0,textNum='';
-        for(i = 0; i < this.yBoxNum; i++) { //这表示行坐标
+        for(i = 0; i < this.yBoxNum; i++) { //杩欒〃绀鸿鍧愭爣
           this.leftTopPointArr.push([]);
           this.boxNumTextList.push([]);
-          for(j=0;j< this.xBoxNum;j++){ //这是列坐标。
+          for(j=0;j< this.xBoxNum;j++){ //杩欐槸鍒楀潗鏍囥��
             var xPoint = (this.getBoxXStart(j));
             var yPoint = (this.getBoxYStart(i));
 						var text = this.getBoxNumText(i,j,days);
 						days = text ? text : days;
             this.leftTopPointArr[i][j] = {x:xPoint, y:yPoint, text:text};
-            this.boxNumTextList[i][j] = this.drawTextShape({x:xPoint+10, y:yPoint+12, text:text });
-            this.zr.addShape(this.boxNumTextList[i][j]);
+            // this.boxNumTextList[i][j] = this.drawTextShape({x:xPoint+10, y:yPoint+12, text:text });
+            // this.zr.addShape(this.boxNumTextList[i][j]);
           }
         }
         console.log("leftTopPointArr",this.leftTopPointArr);
@@ -204,13 +211,13 @@
       },
       addEvent:function(){
 				var _this = this;
-				// 全局事件,当点击了画布上的某个点时。把点击的坐标点所在的小方框放大或点击的是已经放大的则复原。
+				// 鍏ㄥ眬浜嬩欢,褰撶偣鍑讳簡鐢诲竷涓婄殑鏌愪釜鐐规椂銆傛妸鐐瑰嚮鐨勫潗鏍囩偣鎵�鍦ㄧ殑灏忔柟妗嗘斁澶ф垨鐐瑰嚮鐨勬槸宸茬粡鏀惧ぇ鐨勫垯澶嶅師銆�
 				this.zr.on('click', function(params) {
 					console.log('Hello, zrender onClick event obj:',params);
 					// _this.zr.refresh();
 				});
       },
-			getBoxNumText:function(i,j,days){ //得到每个小方框里的数值。会根据这个月有多少天，1号是星期几。
+			getBoxNumText:function(i,j,days){ //寰楀埌姣忎釜灏忔柟妗嗛噷鐨勬暟鍊笺�備細鏍规嵁杩欎釜鏈堟湁澶氬皯澶╋紝1鍙锋槸鏄熸湡鍑犮��
 				var text='';
 				if((i==0 && this.firstDayWeekIndex<=j) || (i!=0 && days < this.monthDays)){
 					text = days+1;
@@ -218,7 +225,7 @@
 				return text;
 			},
 			setEnlargeBoxIndex:function(xIndex,yIndex){ //set the xIndex and yIndex of being enlarged box
-				if(xIndex == this.enlargeBox.xIndex && yIndex == this.enlargeBox.yIndex){ //判断是否是点击的当前正在放大的那个方框
+				if(xIndex == this.enlargeBox.xIndex && yIndex == this.enlargeBox.yIndex){ //鍒ゆ柇鏄惁鏄偣鍑荤殑褰撳墠姝ｅ湪鏀惧ぇ鐨勯偅涓柟妗�
 					this.enlargeBox.xIndex = -1;
 					this.enlargeBox.yIndex = -1;
 				}else{
@@ -226,10 +233,10 @@
 					this.enlargeBox.yIndex = yIndex;
 				}
 			},
-      hasEnlargeBox:function(){ //当前是否有放大的方框
+      hasEnlargeBox:function(){ //褰撳墠鏄惁鏈夋斁澶х殑鏂规
         return (this.enlargeBox.xIndex >= 0 && this.enlargeBox.yIndex >= 0) ? true : false;
       },
-      getBoxXStart:function(index){ //得到小方框的x轴的起点。
+      getBoxXStart:function(index){ //寰楀埌灏忔柟妗嗙殑x杞寸殑璧风偣銆�
         var boxXStart = 0;
         if(this.hasEnlargeBox()){
           if(index <= this.enlargeBox.yIndex){
@@ -242,7 +249,7 @@
         }
         return boxXStart;
       },
-      getBoxYStart:function(index){ //得到小方框的y轴的起点。
+      getBoxYStart:function(index){ //寰楀埌灏忔柟妗嗙殑y杞寸殑璧风偣銆�
         var boxYStart = 0;
         if(this.hasEnlargeBox()){
           if(index <= this.enlargeBox.xIndex){
@@ -257,36 +264,16 @@
       },
 			refreshAllOnClick:function(clickXIndex,clickYIndex){
 				var _this = this;
-				// 获得点击的方框的坐标索引。
-				var i=0,j=0;
-				// var clickX = params.event.offsetX; //鼠标点击的x坐标。
-				// var clickY = params.event.offsetY; // 鼠标点击的y坐标。
-				// var clickXIndex = 0, clickYIndex = 0; //鼠标点击的坐标对应的小方框的索引。
-				// for(i = 0;i < _this.yBoxNum; i++){
-				// 	for(j = 0; j < _this.xBoxNum; j++){
-				// 		if(clickX >= _this.leftTopPointArr[i][j]['x'] && clickY >= _this.leftTopPointArr[i][j]['y']){
-				// 			clickXIndex = i; //行坐标索引；
-				// 			clickYIndex = j; //列坐标索引；
-				// 		}
-				// 	}
-				// }
-				console.log("clickXIndex:",clickXIndex);
-				console.log("clickYIndex:",clickYIndex);
-				if(!_this.leftTopPointArr[clickXIndex][clickYIndex]['text']){
-					return;
-				}
 				_this.isAnimating = true;
 				_this.setEnlargeBoxIndex(clickXIndex,clickYIndex);
-				// 跟新数值的坐标
 				_this.refreshTextShape(false);
-				// 更新图形参数。
-				_this.refreshLineShape();
-				_this.refreshHasNumBoxRectangleShape(true);
+				// _this.refreshLineShape();
+				// _this.refreshHasNumBoxRectangleShape(true);
 				_this.detailCurveCharts.setPosition(_this.leftTopPointArr);
 			},
 			refreshLineShape:function(){
 				var _this = this;
-				for(var i = 0; i <= this.xBoxNum; i++){ // 更新纵线的坐标；
+				for(var i = 0; i <= this.xBoxNum; i++){ // 鏇存柊绾电嚎鐨勫潗鏍囷紱
 					var boxXStart = (this.getBoxXStart(i));
 					var colLine = this.colLineShapeList[i];
 					(function(boxXStart,colLine){
@@ -303,7 +290,7 @@
 						},10);
 					})(boxXStart,colLine);
 				}
-				for(var i = 0; i <= this.yBoxNum; i++){ // 更新横线的坐标：
+				for(var i = 0; i <= this.yBoxNum; i++){ // 鏇存柊妯嚎鐨勫潗鏍囷細
 					var boxYStart = (this.getBoxYStart(i));
 					var rowLine = this.rowLineShapeList[i];
 					(function(boxYStart,rowLine){
@@ -325,7 +312,7 @@
 				var _this = this;
 				var i=0, j=0, days=0, text='';
 				for(i = 0; i < this.yBoxNum; i++) {
-					for(var j=0;j< this.xBoxNum;j++){ //这是列坐标。
+					for(var j=0;j< this.xBoxNum;j++){ //杩欐槸鍒楀潗鏍囥��
 						var xPoint = (this.getBoxXStart(j));
 						var yPoint = (this.getBoxYStart(i));
 						var text = this.getBoxNumText(i,j,days);
@@ -333,24 +320,23 @@
 						this.leftTopPointArr[i][j]['x'] = xPoint;
 						this.leftTopPointArr[i][j]['y'] = yPoint;
 						this.leftTopPointArr[i][j]['text'] = text;
-						var boxNumText = this.boxNumTextList[i][j];
-						if(isNeedChangeNumText){
-							boxNumText.style.text = text;
-							this.zr.modShape(boxNumText.id, boxNumText);
-						}
-						(function(xPoint,yPoint,boxNumText){
-							setTimeout(function(){
-								_this.zr.animate(boxNumText.id,'style').when(_this.animationTime,{
-									x:xPoint+10,
-									y:yPoint+12
-								}).done(function(){
-									boxNumText.style.x = xPoint+10;
-									boxNumText.style.y = yPoint+12;
-									_this.zr.modShape(boxNumText.id, boxNumText);
-									// setTimeout(function(){_this.zr.refresh()},10);
-								}).start();
-							},10);
-						})(xPoint,yPoint,boxNumText);
+						// var boxNumText = this.boxNumTextList[i][j];
+						// if(isNeedChangeNumText){
+						// 	boxNumText.style.text = text;
+						// 	this.zr.modShape(boxNumText.id, boxNumText);
+						// }
+						// (function(xPoint,yPoint,boxNumText){
+						// 	setTimeout(function(){
+						// 		_this.zr.animate(boxNumText.id,'style').when(_this.animationTime,{
+						// 			x:xPoint+10,
+						// 			y:yPoint+12
+						// 		}).done(function(){
+						// 			boxNumText.style.x = xPoint+10;
+						// 			boxNumText.style.y = yPoint+12;
+						// 			_this.zr.modShape(boxNumText.id, boxNumText);
+						// 		}).start();
+						// 	},10);
+						// })(xPoint,yPoint,boxNumText);
 					}
 				}
 				//refresh calendar header's position of week text.
@@ -526,7 +512,7 @@
             draggable : false
         });
       },
-      //根据某年某月某日算出这天是星期几。每周从周日开始，索引index为0.
+      //鏍规嵁鏌愬勾鏌愭湀鏌愭棩绠楀嚭杩欏ぉ鏄槦鏈熷嚑銆傛瘡鍛ㄤ粠鍛ㄦ棩寮�濮嬶紝绱㈠紩index涓�0.
       getWeekDayByDate:function(year,month,day){
         var w=0,y=0,c=0,m=0,d=0;
         if(month<3){
@@ -541,7 +527,7 @@
         w=y+(y/4)+(c/4)-2*c+(26*(m+1)/10)+d-1;
         return w<0 ? (7+w) : Math.floor(w%7)%7;
       },
-      getSumDaysOfMonth:function(year,month){ //获取某年某月的当月总天数。
+      getSumDaysOfMonth:function(year,month){ //鑾峰彇鏌愬勾鏌愭湀鐨勫綋鏈堟�诲ぉ鏁般��
         var  tempDate = new Date(year,month,0);
         return tempDate.getDate();
       }
