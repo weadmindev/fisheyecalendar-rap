@@ -13,7 +13,7 @@ public class Piccolo2dJS extends SVWidgetBase{
 	private static final long serialVersionUID = -7580109674486263430L;
 
 	public Piccolo2dJS(Composite parent, int style) {
-		super(parent, style);
+		super(parent, style); 
 	}
 
 	//show text
