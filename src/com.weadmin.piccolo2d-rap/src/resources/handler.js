@@ -11,8 +11,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		},
 
 		destructor : "destroy",
-		methods : ['showText'],
-		properties : [ "size"],
+		methods : ['showText','showList'],
+		properties : [ "size",'data'],
 		events:[]
 
 	});
@@ -26,7 +26,6 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		bindAll(this, [ "layout", "onReady", "onSend", "onRender"]);
 		this.parent = rap.getObject(properties.parent);
     console.log("this.parent:",this.parent);
-		// this.addCalendarHeader(this.parent);
 		this.element = document.createElement("div");
 		this.canvasElement = document.createElement("canvas");
 		this.parent.append(this.element);
@@ -70,11 +69,13 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		onRender : function() {
       var _this = this;
 			if (this.element.parentNode) {
+				console.log("have the parentNode onRender!!!!");
 				rap.off("render", this.onRender);
 				// Creates the graph inside the given container
 				this.fishEyeCalendar = new FishEyeCalendar({
 					year:2016,
 					month:11,
+					dataList:this.dataList,
 					basePath:PICCOLO2D_BASEPATH,
 					container:_this.fishEyeContainer,
 					detailContainer:this.detailChartContainer
@@ -95,45 +96,48 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			//rap.getRemoteObject( this ).set( "model", xml);
 			//console.log("mxgraph...onSend..")
 		},
-		addCalendarHeader:function(parent){ //增加日历头
-			var that = this;
-			var ele = document.createElement('div');
-			var $ele = $(ele);
-			$ele.append("<span>年：</span><select class='calendarYear'>\
-				<option value='2013'>2013</option>\
-				<option value='2014'>2014</option>\
-				<option value='2015'>2015</option>\
-				<option value='2016'>2016</option>\
-				<option value='2017'>2017</option>\
-        <option value='2018'>2018</option>\
-      </select><span>  月：</span><select class='calendarMonth'>\
-        <option value='1'>1</option>\
-				<option value='2'>2</option>\
-				<option value='3'>3</option>\
-				<option value='4'>4</option>\
-				<option value='5'>5</option>\
-				<option value='6'>6</option>\
-				<option value='7'>7</option>\
-				<option value='8'>8</option>\
-				<option value='9'>9</option>\
-				<option value='10'>10</option>\
-				<option value='11'>11</option>\
-        <option value='12'>12</option>\
-      </select>");
-			$ele.find('.calendarYear').val(2016);
-			$ele.find('.calendarMonth').val(10);
-			$ele.on('change','.calendarYear',function(){
-				var $this = $(this);
-				console.log("selected calendar year:",$this.val());
-				that.fishEyeCalendar.refreshShapeByYearMonth($this.val(),$this.closest('div').find('.calendarMonth').val());
-			});
-			$ele.on('change','.calendarMonth',function(){
-				var $this = $(this);
-				that.fishEyeCalendar.refreshShapeByYearMonth($this.closest('div').find('.calendarYear').val(),$this.val());
-			});
-			parent.append($ele[0]);
+		// addCalendarHeader:function(parent){ //增加日历头
+		// 	var that = this;
+		// 	var ele = document.createElement('div');
+		// 	var $ele = $(ele);
+		// 	$ele.append("<span>年：</span><select class='calendarYear'>\
+		// 		<option value='2013'>2013</option>\
+		// 		<option value='2014'>2014</option>\
+		// 		<option value='2015'>2015</option>\
+		// 		<option value='2016'>2016</option>\
+		// 		<option value='2017'>2017</option>\
+    //     <option value='2018'>2018</option>\
+    //   </select><span>  月：</span><select class='calendarMonth'>\
+    //     <option value='1'>1</option>\
+		// 		<option value='2'>2</option>\
+		// 		<option value='3'>3</option>\
+		// 		<option value='4'>4</option>\
+		// 		<option value='5'>5</option>\
+		// 		<option value='6'>6</option>\
+		// 		<option value='7'>7</option>\
+		// 		<option value='8'>8</option>\
+		// 		<option value='9'>9</option>\
+		// 		<option value='10'>10</option>\
+		// 		<option value='11'>11</option>\
+    //     <option value='12'>12</option>\
+    //   </select>");
+		// 	$ele.find('.calendarYear').val(2016);
+		// 	$ele.find('.calendarMonth').val(10);
+		// 	$ele.on('change','.calendarYear',function(){
+		// 		var $this = $(this);
+		// 		console.log("selected calendar year:",$this.val());
+		// 		that.fishEyeCalendar.refreshShapeByYearMonth($this.val(),$this.closest('div').find('.calendarMonth').val());
+		// 	});
+		// 	$ele.on('change','.calendarMonth',function(){
+		// 		var $this = $(this);
+		// 		that.fishEyeCalendar.refreshShapeByYearMonth($this.closest('div').find('.calendarYear').val(),$this.val());
+		// 	});
+		// 	parent.append($ele[0]);
+		// },
+		showList:function(obj){
+			console.log('showList:',obj);
+			this.dataList = obj.data;
 		},
-
 		showText:function(obj){
 			var ptxt = new PText(obj.text);
 			this._layer.addChild(ptxt);
