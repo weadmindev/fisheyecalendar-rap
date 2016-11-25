@@ -51,7 +51,7 @@ public class Piccolo2dJS extends SVWidgetBase{
 		for(JsonObject json:list){
 			date = json.get("savetime").asString();
 			day = date.substring(8, 9).equals("0")?date.substring(9, 10):date.substring(8, 10);
-			x = Double.valueOf(date.substring(11, 13))*24 + Double.valueOf(date.substring(14, 16));
+			x = Double.valueOf(date.substring(11, 13))*60 + Double.valueOf(date.substring(14, 16));
 			temp_package_array = new JsonArray();
 			temp_retime_array = new JsonArray();
 			temp_package_array.add(x).add(Double.valueOf(json.get("package").asString()));
