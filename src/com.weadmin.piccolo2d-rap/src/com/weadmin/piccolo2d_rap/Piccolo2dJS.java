@@ -1,7 +1,12 @@
 package com.weadmin.piccolo2d_rap;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+import javax.print.attribute.standard.RequestingUserName;
+
 import org.eclipse.rap.json.JsonArray;
 import org.eclipse.rap.json.JsonObject;
 import org.eclipse.swt.widgets.Composite;
@@ -25,6 +30,14 @@ public class Piccolo2dJS extends SVWidgetBase{
 	}
 	
 	public void showList(List<JsonObject> list){
+		Collections.sort(list,new Comparator<JsonObject>() {//order by savetime
+			public int compare(JsonObject json1,JsonObject json2){
+				if (json1!=null&&json2!=null) {
+					return json1.get("savetime").asString().compareTo(json2.get("savetime").asString());
+				}
+				return 0;
+			}
+		});
 		super.callRemoteMethod("showList", dealWithData(list));
 	}
 
@@ -83,7 +96,9 @@ public class Piccolo2dJS extends SVWidgetBase{
 		res.add(new CustomRes("esl.js", true, false));
 		res.add(new CustomRes("zrender.js", true, false));
 		res.add(new CustomRes("jquery.js", true, false));
+		res.add(new CustomRes("echarts.min.js", true, false));
 		res.add(new CustomRes("piccolo2d.js", true, false));
+		res.add(new CustomRes("detailCharts.js", true, false));
 		res.add(new CustomRes("fishEyeCalendar.js", true, false));
 		res.add(new CustomRes("handler.js", true, false));
 		return res;
