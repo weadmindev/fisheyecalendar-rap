@@ -22,13 +22,6 @@ public class Piccolo2dJS extends SVWidgetBase{
 		super(parent, style);
 	}
 
-	//show text
-	public void showText(String text){
-		JsonObject parameters = new JsonObject();
-		parameters.add("text", text);
-		super.callRemoteMethod("showText", parameters);
-	}
-	
 	public void showList(List<JsonObject> list){
 		Collections.sort(list,new Comparator<JsonObject>() {//order by savetime
 			public int compare(JsonObject json1,JsonObject json2){
@@ -69,15 +62,15 @@ public class Piccolo2dJS extends SVWidgetBase{
 		data.add("data", jsons);
 		return data;
 	}
-	
+
 	@Override
 	protected void handleSetProp(JsonObject properties) {
-
+		//  System.out.println("handleSetProp from the js trigger!!");
 	}
 
 	@Override
 	protected void handleCallMethod(String method, JsonObject parameters) {
-
+		// System.out.println("handleCallMethod :"+method);
 	}
 
 	@Override

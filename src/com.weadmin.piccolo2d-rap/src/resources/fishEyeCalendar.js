@@ -17,8 +17,8 @@
         this.yBoxNum = 6;  //the number of row of one month.
         this.boxWidthEnlargeRatio = 0.5;
         this.boxHeightEnlargeRatio = 0.5;
-        this.year = options.year || 2016;
-        this.month = options.month || 11;
+        this.year = options.year;
+        this.month = options.month;
         this.basePath = options.basePath;
 				this.container = options.container;
 				this.dataList = options.dataList;
@@ -32,6 +32,7 @@
 				this.echarts = null;  //
 				this.detailCurveCharts = null;
 				this.todayDate = new Date();
+				this.todayIndex = {xIndex:-1,yIndex:-1};
         this.initPathsConfig();
         this.initElement();
 	    },
@@ -120,9 +121,9 @@
 				// this.colLineShapeList = [];
         // this.rowLineShapeList = [];
         // this.boxNumTextList = [];
+				this.prevMonthDays = this.getSumDaysOfMonth(this.year,this.month-1); //the total number of days of one month.
 				this.monthDays = this.getSumDaysOfMonth(this.year,this.month); //the total number of days of one month.
         this.firstDayWeekIndex = this.getWeekDayByDate(this.year,this.month,1); //the first day of one month is day of the week.
-				this.todayIndex = (this.todayDate.getFullYear() == this.year && this.todayDate.getMonth()==this.month-1) ? this.todayDate.getDate()-1 : -1;
 				this.setCoordinateAndDayNum();
 				this.detailContainer.setAttribute('id','detailChartContainers');
 				this.detailContainer.style.position = 'absolute';
@@ -133,19 +134,30 @@
 				this.detailContainer.style.top = this.yStart+'px';
       },
 			setCoordinateAndDayNum:function(){
-				var i=0,j=0,days=0,dayNum='';
+				var todayInFlag = '';
+				if(this.todayDate.getFullYear() == this.year){
+					if(this.todayDate.getMonth() == this.month-1){
+						todayInFlag = 'current';
+					}else if(this.todayDate.getMonth()-(this.month-1) ==1){ //今天所在月份如果只比当前显示的月份大一个月，则表示今天就在next month.
+						todayInFlag = 'next';
+					}
+				}
+				var todayNum = this.todayDate.getDate();
+				var i=0,j=0,days=0,dayObj={};
         for(i = 0; i < this.yBoxNum; i++) {
           this.leftTopPointArr.push([]);
           for(j=0;j< this.xBoxNum;j++){
-						dayNum = this.getBoxNumText(i,j,days);
-						days = dayNum ? dayNum : days;
+						dayObj = this.getBoxNumText(i,j,days);
+						days = dayObj.flag=='current'? dayObj.text : days;
+						if((todayInFlag=='current' || todayInFlag=='next') && todayNum==dayObj.text ){ //判断今天是否在当前显示日历里。
+							this.todayIndex = {xIndex:i,yIndex:j};
+						}
             this.leftTopPointArr[i][j] = {
 							x:this.getBoxXStart(j),
 							y:this.getBoxYStart(i),
-							text:dayNum
+							flag:dayObj.flag,
+							text:dayObj.text
 						};
-            // this.boxNumTextList[i][j] = this.drawTextShape({x:xPoint+10, y:yPoint+12, text:text });
-            // this.zr.addShape(this.boxNumTextList[i][j]);
           }
         }
 				console.log("leftTopPointArr0000:",this.leftTopPointArr);
@@ -166,42 +178,23 @@
 					this.zr.addShape(this.headerTextList[i]);
 				}
 			},
-      // initAllLineShape:function(){
-      //   for(var i = 0; i <= this.xBoxNum; i++) { //鐢荤珫绾裤�傚彉鐨勬槸x杞存柟鍚戠殑鍧愭爣
-      //       var boxXStart = (this.getBoxXStart(i));
-      //       this.colLineShapeList[i] = this.drawLineShape({
-			// 				xStart:boxXStart,
-			// 				yStart:this.yStart,
-			// 				xEnd:boxXStart,
-			// 				yEnd:this.height
-			// 			});
-      //       this.zr.addShape(this.colLineShapeList[i]);
-      //   }
-      //   for(var i = 0; i <= this.yBoxNum; i++) { //鐢绘í绾裤�傚彉鐨勬槸y杞存柟鍚戠殑鍧愭爣
-      //     var boxYStart = (this.getBoxYStart(i));
-			// 		this.rowLineShapeList[i] = this.drawLineShape({
-			// 			xStart:this.xStart,
-			// 			yStart:boxYStart,
-			// 			xEnd:this.width,
-			// 			yEnd:boxYStart
-			// 		});
-      //     this.zr.addShape(this.rowLineShapeList[i]);
-      //   }
-      // },
       addEvent:function(){
 				var _this = this;
-				// 鍏ㄥ眬浜嬩欢,褰撶偣鍑讳簡鐢诲竷涓婄殑鏌愪釜鐐规椂銆傛妸鐐瑰嚮鐨勫潗鏍囩偣鎵�鍦ㄧ殑灏忔柟妗嗘斁澶ф垨鐐瑰嚮鐨勬槸宸茬粡鏀惧ぇ鐨勫垯澶嶅師銆�
 				this.zr.on('click', function(params) {
-					console.log('Hello, zrender onClick event obj:',params);
 					// _this.zr.refresh();
 				});
       },
 			getBoxNumText:function(i,j,days){ //get the day number in some box.
-				var text='';
-				if((i==0 && this.firstDayWeekIndex<=j) || (i!=0 && days < this.monthDays)){
-					text = days+1;
+				if(i==0 && this.firstDayWeekIndex>j){
+					return {flag:'prev',text:this.prevMonthDays-this.firstDayWeekIndex+j+1};
 				}
-				return text;
+				if((i==0 && this.firstDayWeekIndex<=j) || (i!=0 && days < this.monthDays)){
+					return {flag:'current',text:i*this.xBoxNum+j-2+1};
+				}
+				if(i!=0 && days >= this.monthDays){
+					return {flag:'next',text:i*this.xBoxNum+j+1-this.firstDayWeekIndex-this.monthDays};
+				}
+				return {flag:'',text:''};
 			},
 			setEnlargeBoxIndex:function(xIndex,yIndex){ //set the xIndex and yIndex of being enlarged box
 				if(xIndex == this.enlargeBox.xIndex && yIndex == this.enlargeBox.yIndex){ //鍒ゆ柇鏄惁鏄偣鍑荤殑褰撳墠姝ｅ湪鏀惧ぇ鐨勯偅涓柟妗�
@@ -249,14 +242,15 @@
 			},
 			refreshTextShape:function(){
 				var _this = this;
-				var i=0, j=0, days=0, text='';
+				var i=0, j=0, days=0, dayObj={flag:'',text:''};
 				for(i = 0; i < this.yBoxNum; i++) {  //update the box x and y coordinate point.
 					for(var j=0;j< this.xBoxNum;j++){
-						var text = this.getBoxNumText(i,j,days);
-						days = text ? text : days;
+						dayObj = this.getBoxNumText(i,j,days);
+						days = dayObj.flag=='current'? dayObj.text : days;
 						this.leftTopPointArr[i][j]['x'] = this.getBoxXStart(j);
 						this.leftTopPointArr[i][j]['y'] = this.getBoxYStart(i);
-						this.leftTopPointArr[i][j]['text'] = text;
+						this.leftTopPointArr[i][j]['flag'] = dayObj.flag;
+						this.leftTopPointArr[i][j]['text'] = dayObj.text;
 					}
 				}
 				//refresh calendar header's position of week text.
@@ -265,16 +259,20 @@
 					var endPoint = (i==firstRowPointArr.length-1) ? this.width : firstRowPointArr[i+1]['x'];
 					var offsetX = (endPoint-firstRowPointArr[i]['x'])/2;
 					var xPoint = firstRowPointArr[i]['x'] + offsetX;
-					var headerText = this.headerTextList[i];
-					(function(headerText,xPoint,_this){
-						_this.zr.animate(headerText.id,'style').when(_this.animationTime,{
+					(function(index,xPoint,animationTime){
+						var headerText = _this.headerTextList[index];
+						_this.zr.animate(headerText.id,'style').when(animationTime,{
 							x:xPoint
 						}).start();
-					})(headerText,xPoint,_this);
+					})(i,xPoint,_this.animationTime);
 				}
 			},
 			refreshShapeByYearMonth:function(year,month){  //change the calendar shape by change the year or month.
 				var _this = this;
+				if(month<=0){ //就当作上一年的最后一个月。
+					year--;
+					month=12;
+				}
 				this.year = +year;
 				this.month = +month;
 				this.enlargeBox.xIndex = -1;
@@ -297,6 +295,9 @@
 				// 		}
 				// 	}
 				// }
+			},
+			refreshAll:function(){
+
 			},
 
 			// draw the base line shape.
@@ -375,7 +376,7 @@
         w=y+(y/4)+(c/4)-2*c+(26*(m+1)/10)+d-1;
         return w<0 ? (7+w) : Math.floor(w%7)%7;
       },
-      getSumDaysOfMonth:function(year,month){ //鑾峰彇鏌愬勾鏌愭湀鐨勫綋鏈堟�诲ぉ鏁般��
+      getSumDaysOfMonth:function(year,month){ //鑾峰彇鏌愬勾鏌愭湀鐨勫綋鏈堟�诲ぉ鏁般
         var  tempDate = new Date(year,month,0);
         return tempDate.getDate();
       }

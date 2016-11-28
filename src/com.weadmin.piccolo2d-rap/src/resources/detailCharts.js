@@ -51,13 +51,12 @@
           ele.style.height = (nextPointY - leftTop.y + this.yStart)+'px';
           this.chartContainerArr[i][j] = ele;
           this.container.appendChild(ele);
-          var dayNum = leftTop['text'];
-          if(dayNum){
-            ele.setAttribute('data-index',dayNum);
-            ele.style.backgroundColor = '#fff';
-            this.lineChartsArr[i][j] = this.echarts.init(ele, null, {renderer: 'canvas'});
-            this.lineChartsArr[i][j].setOption(this.getChartData(dayNum));
-          }
+          ele.setAttribute('data-flag',leftTop.flag);
+          ele.setAttribute('data-index',leftTop.text);
+          ele.setAttribute('data-xindex',i);
+          ele.setAttribute('data-yindex',j);
+          this.lineChartsArr[i][j] = this.echarts.init(ele, null, {renderer: 'canvas'});
+          this.lineChartsArr[i][j].setOption(this.getChartData(leftTop.text,leftTop.flag));
         }
       }
       this.setTodayBoxBorderColor();
@@ -110,21 +109,18 @@
       for(var i = 0; i < this.yBoxNum; i++) {
         for(var j=0;j< this.xBoxNum;j++){
           this.chartContainerArr[i][j].onmouseenter = function(e){
-            var index = e.currentTarget.getAttribute('data-index');
-            if(!index || index-1 >= _this.todayIndex){return;}
+            if(!_this.canResponseEvent(e)){return;}
             e.currentTarget.style.border = '2px solid #ff7227';
           };
           this.chartContainerArr[i][j].onmouseleave = function(e){
-            var index = e.currentTarget.getAttribute('data-index');
-            if(!index || index-1 >= _this.todayIndex){return;}
+            if(!_this.canResponseEvent(e)){return;}
             e.currentTarget.style.border = '1px solid #888A8E';
           };
           this.chartContainerArr[i][j].onclick = function(e){
+            if(!_this.canClickEnlarge){return;}
+            if(!_this.canResponseEvent(e)){return;}
+            var flag = e.currentTarget.getAttribute('data-flag');
             var index = +e.currentTarget.getAttribute('data-index');
-            if(!index || index-1 > _this.todayIndex){return;}
-            if(!_this.canClickEnlarge){
-              return;
-            }
             var rowNum = _this.leftTopPointArr.length;
             var colNum = _this.leftTopPointArr[0].length;
             var clickXIndex=_this.enlargeBox.xIndex,clickYIndex=_this.enlargeBox.yIndex;
@@ -134,7 +130,7 @@
             }
             for(var i=0;i<rowNum;i++){
               for(var j=0;j<colNum;j++){
-                if(+_this.leftTopPointArr[i][j]['text'] == index){
+                if(+_this.leftTopPointArr[i][j]['text'] == index && _this.leftTopPointArr[i][j]['flag']==flag){
                   clickXIndex = i;
                   clickYIndex = j;
                 }
@@ -161,6 +157,13 @@
         }
       }
     },
+    canResponseEvent:function(e){
+      var canResponse = true;
+      var xIndex = +e.currentTarget.getAttribute('data-xindex');
+      var yIndex = +e.currentTarget.getAttribute('data-yindex');
+      if(xIndex*this.xBoxNum+yIndex > this.todayIndex.xIndex*this.xBoxNum+this.todayIndex.yIndex){canResponse = false;}
+      return canResponse;
+    },
     setEnlargeBox:function(enlargeBox){
       this.enlargeBox = enlargeBox;
     },
@@ -168,9 +171,9 @@
       return (this.enlargeBox.xIndex >= 0 && this.enlargeBox.yIndex >= 0) ? true : false;
     },
     setTodayBoxBorderColor:function(){
-      if(this.todayIndex>=0){
-        var i = parseInt((this.todayIndex+this.firstDayWeekIndex)/this.xBoxNum);
-        var j = parseInt((this.todayIndex+this.firstDayWeekIndex)%this.xBoxNum);
+      if(this.todayIndex.xIndex>=0){
+        var i = parseInt(this.todayIndex.xIndex);
+        var j = parseInt(this.todayIndex.yIndex);
         this.chartContainerArr[i][j].style.border = '1px solid #C3CC3D';
         this.chartContainerArr[i][j].style.boxShadow = '0 0 6px 2px #C1EA1C';
         this.chartContainerArr[i][j].style.zIndex = '99999';
@@ -221,11 +224,12 @@
           }
           this.parseDataList.push(obj);
         }
+        this.parseDataList.push(this.parseDataList[this.parseDataList.length-1]);
         console.log('this.parseDataList:',this.parseDataList);
     },
-    getChartData:function(dayTxt){
+    getChartData:function(dayTxt,flag){
         var chartData = {
-          // backgroundColor:'#F10113',
+          backgroundColor: flag=='current' ? '#fff' : '#D8DBE4',
           animationDurationUpdate:this.animationTime,
           animationEasingUpdate:'cubicInOut',
           title: {

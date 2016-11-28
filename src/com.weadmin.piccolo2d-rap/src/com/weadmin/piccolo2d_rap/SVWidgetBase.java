@@ -27,7 +27,7 @@ public abstract class SVWidgetBase extends Composite {
 		private String path;
 		private boolean load;
 		private boolean css;
-		
+
 		public CustomRes(String path, boolean load, boolean css) {
 			super();
 			this.path = path;
@@ -46,11 +46,11 @@ public abstract class SVWidgetBase extends Composite {
 		public boolean isCss() {
 			return css;
 		}
-		
+
 	}
 
 	private static final String RESOURCES_PATH = "resources/";
-	
+
 	private ArrayList<CustomRes> resources;
 
 	private final RemoteObject remoteObject;
@@ -71,17 +71,17 @@ public abstract class SVWidgetBase extends Composite {
 			handleCallNotify(event,properties);
 		}
 	};
-	
-	
-	
+
+
+
 	protected abstract void handleSetProp(JsonObject properties);
 	protected abstract void handleCallMethod(String method, JsonObject parameters);
 	protected abstract void handleCallNotify(String event, JsonObject parameters);
-	
+
 	protected abstract String getWidgetName();
-	
+
 	protected abstract ArrayList<CustomRes> getCustomRes();
-	
+
 	protected void setRemoteProp(String name,JsonObject prop){
 		remoteObject.set(name, prop);
 	}
@@ -91,69 +91,69 @@ public abstract class SVWidgetBase extends Composite {
 	protected void setRemoteProp(String name,boolean prop){
 		remoteObject.set(name, prop);
 	}
-	
+
 	protected void setRemoteProp(String name,double prop){
 		remoteObject.set(name, prop);
 	}
 	protected void setRemoteProp(String name,int prop){
 		remoteObject.set(name, prop);
 	}
-	
+
 	protected void callRemoteMethod(String name,JsonObject parameters){
 		remoteObject.call(name, parameters);
 	}
-	
-	
+
+
 	private String getRemoteName(){
 		return "eclipsesource."+ getWidgetName();
 	}
-	
+
 	private String getRegisterPath(){
 		return getWidgetName()+"/";
 	}
-	
+
 
 	public SVWidgetBase(Composite parent, int style) {
 		super(parent, style);
 		resources = new ArrayList<>();
 		resources.addAll(getCustomRes());
-		
+
 		registerResources();
 		loadJavaScript();
 		Connection connection = RWT.getUISession().getConnection();
 		remoteObject = connection.createRemoteObject(getRemoteName());
 		remoteObject.setHandler(operationHandler);
 		//remoteObject.listen("modelUpdate", true);
-		
+
 		remoteObject.set("parent", WidgetUtil.getId(this));
-		
+
 		this.addControlListener(new ControlListener() {
-			
+
 			@Override
 			public void controlResized(ControlEvent e) {
 				Point size = getSize();
 				setRemoteSize(size.x, size.y);
-				
+
 			}
-			
+
 			@Override
 			public void controlMoved(ControlEvent e) {
 			}
 		});
 
 	}
-	
+
 	private void setRemoteSize(int width,int height) {
 		JsonObject parameters = new JsonObject();
 		parameters.add("width", width);
 		parameters.add("height", height);
 		remoteObject.set("size", parameters);
-		
+
 	}
 
 	private void registerResources() {
 		ResourceManager resourceManager = RWT.getResourceManager();
-		
+
 		//if (!isRegistered) {
 			try {
 				for (CustomRes res : resources) {
@@ -171,7 +171,7 @@ public abstract class SVWidgetBase extends Composite {
 
 		ClientFileLoader loader = RWT.getClient().getService(ClientFileLoader.class);
 		ResourceManager resourceManager = RWT.getResourceManager();
-		
+
 		for (CustomRes res : resources) {
 			if (res.isLoad()){
 				if (res.isCss())
@@ -192,7 +192,7 @@ public abstract class SVWidgetBase extends Composite {
 			inputStream.close();
 		}
 	}
-	
+
 
 	////////////////////
 	// overwrite methods
@@ -201,12 +201,12 @@ public abstract class SVWidgetBase extends Composite {
 	public void setLayout(Layout layout) {
 		throw new UnsupportedOperationException("Cannot change internal layout of CkEditor");
 	}
-	
+
 	@Override
 	public void dispose() {
 		remoteObject.destroy();
 		super.dispose();
 	}
 
-	
+
 }

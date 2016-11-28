@@ -11,7 +11,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		},
 
 		destructor : "destroy",
-		methods : ['showText','showList'],
+		methods : ['showList'],
 		properties : [ "size",'data'],
 		events:[]
 
@@ -22,14 +22,12 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 	}
 
 	eclipsesource.piccolo2djs = function(properties) {
-		console.log("piccolo2djs....." + properties)
+		console.log("piccolo2djs....." , properties)
 		bindAll(this, [ "layout", "onReady", "onSend", "onRender"]);
-		this.parent = rap.getObject(properties.parent);
+		this.parent = rap.getObject(properties.parent); //获取java端的一个图形容器。
     console.log("this.parent:",this.parent);
 		this.element = document.createElement("div");
-		this.canvasElement = document.createElement("canvas");
 		this.parent.append(this.element);
-		this.parent.append(this.canvasElement);
 		this.parent.addListener("Resize", this.layout);
 
 		this._size = properties.size ? properties.size : {
@@ -50,9 +48,6 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		// this.detailChartContainer.style.height = "100%";
 		this.element.appendChild(this.detailChartContainer);
 
-		this._canvas = new PCanvas(this.canvasElement);
-		this._layer = this._canvas.camera.layers[0];
-
 		rap.on("render", this.onRender);
 	};
 	eclipsesource.piccolo2djs.prototype = {
@@ -63,7 +58,6 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			this.ready = true;
 			this.layout();
 			console.log("piccolo2djs...onReady..");
-
 		},
 
 		onRender : function() {
@@ -82,19 +76,18 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				});
         /////////////////////
 				rap.on("send", this.onSend);
-
 				this.ready = true;
-				this.layout();
+				// this.layout();
 			}
 		},
-		onSend : function() {
+		onSend : function() { //要浏览器客户端任何一个操作就会触发。
 			// if( this.editor.checkDirty() ) {
 			// rap.getRemoteObject( this ).set( "text", this.editor.getData() );
 			// this.editor.resetDirty();
 			// }
-
-			//rap.getRemoteObject( this ).set( "model", xml);
-			//console.log("mxgraph...onSend..")
+			rap.getRemoteObject( this ).set( "model", "123456789"); //设置后端的值，还有其他两个方法:call(method,properties):调用后端的方法,notify(event,properties);
+			// rap.getRemoteObject( this ).call( "handleCallRefreshData", "123456789"); //设置后端的值，还有其他两个方法:call(method,properties):调用后端的方法,notify(event,properties);
+			console.log("mxgraph...onSend..")
 		},
 		// addCalendarHeader:function(parent){ //增加日历头
 		// 	var that = this;
@@ -138,13 +131,14 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			console.log('showList:',obj);
 			this.dataList = obj.data;
 		},
-		showText:function(obj){
-			var ptxt = new PText(obj.text);
-			this._layer.addChild(ptxt);
-		},
 		setSize : function(size) {
+			var _this = this;
 			if (this.ready) {
 				async(this, function() { // Needed by IE for some reason
+					_this._size = size;
+					_this.element.style.width = size.width+"px";
+			    _this.element.style.height = (size.height-20)+"px";
+					_this.fishEyeCalendar.refreshAll();
 				});
 			} else {
 				this._size = size;
@@ -165,7 +159,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				this.element.style.top = area[1] + "px";
 				this.element.style.width = area[2] + "px";
 				this.element.style.height = area[3] + "px";
-
+				this._size = {width:area[2],height:area[3]};
+				this.fishEyeCalendar.refreshAll();
 			}
 		}
 

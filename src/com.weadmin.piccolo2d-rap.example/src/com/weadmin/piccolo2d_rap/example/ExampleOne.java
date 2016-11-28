@@ -20,7 +20,6 @@ public class ExampleOne extends AbstractEntryPoint{
 		parent.setLayout(null);
 		Piccolo2dJS pjs = new Piccolo2dJS(parent, SWT.NONE);
 		pjs.setBounds(20, 0, 1000, 600);
-		pjs.showText("Hello World!");
 		List list = dataModle();
 		pjs.showList(list);
 	}
@@ -48,11 +47,11 @@ public class ExampleOne extends AbstractEntryPoint{
 		}
 		return list;
 	}
-	
+
 	public static String getRandom(int t){
 		int i = (int) (Math.random()*t);
 		String s = (i<10?"0"+i:i+"");
 		return s;
 	}
-	
+
 }
