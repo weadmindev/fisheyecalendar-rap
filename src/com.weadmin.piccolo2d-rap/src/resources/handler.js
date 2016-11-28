@@ -12,7 +12,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 
 		destructor : "destroy",
 		methods : ['showText','showList'],
-		properties : [ "size",'data'],
+		properties : [ "size",'date'],
 		events:[]
 
 	});
@@ -134,6 +134,11 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		// 	});
 		// 	parent.append($ele[0]);
 		// },
+		setDate:function(obj){
+			this._date = obj.date;
+			this._currentDay = obj.currentDay;
+			console.log('date:',obj);
+		},
 		showList:function(obj){
 			console.log('showList:',obj);
 			this.dataList = obj.data;
