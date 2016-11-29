@@ -108,7 +108,7 @@ public class Piccolo2dJS extends SVWidgetBase{
 	}
 
 	public static Date stringToDate(String s){
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = null;
 		try {
 			date = sdf.parse(s);
