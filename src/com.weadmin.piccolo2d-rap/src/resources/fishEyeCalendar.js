@@ -15,8 +15,8 @@
         this.height=0;
         this.xBoxNum = 7; //the number of days of one week.
         this.yBoxNum = 6;  //the number of row of one month.
-        this.boxWidthEnlargeRatio = 0.5;
-        this.boxHeightEnlargeRatio = 0.5;
+        this.boxWidthEnlargeRatio = 0.6;
+        this.boxHeightEnlargeRatio = 0.6;
         this.year = options.year;
         this.month = options.month;
         this.basePath = options.basePath;
@@ -135,6 +135,7 @@
       },
 			setCoordinateAndDayNum:function(){
 				var todayInFlag = '';
+				var todayNum = this.todayDate.getDate();
 				if(this.todayDate.getFullYear() == this.year){
 					if(this.todayDate.getMonth() == this.month-1){
 						todayInFlag = 'current';
@@ -142,14 +143,13 @@
 						todayInFlag = 'next';
 					}
 				}
-				var todayNum = this.todayDate.getDate();
 				var i=0,j=0,days=0,dayObj={};
         for(i = 0; i < this.yBoxNum; i++) {
           this.leftTopPointArr.push([]);
           for(j=0;j< this.xBoxNum;j++){
 						dayObj = this.getBoxNumText(i,j,days);
 						days = dayObj.flag=='current'? dayObj.text : days;
-						if((todayInFlag=='current' || todayInFlag=='next') && todayNum==dayObj.text ){ //判断今天是否在当前显示日历里。
+						if(todayInFlag==dayObj.flag && todayNum==dayObj.text ){ //判断今天是否在当前显示日历里。
 							this.todayIndex = {xIndex:i,yIndex:j};
 						}
             this.leftTopPointArr[i][j] = {
@@ -189,7 +189,7 @@
 					return {flag:'prev',text:this.prevMonthDays-this.firstDayWeekIndex+j+1};
 				}
 				if((i==0 && this.firstDayWeekIndex<=j) || (i!=0 && days < this.monthDays)){
-					return {flag:'current',text:i*this.xBoxNum+j-2+1};
+					return {flag:'current',text:i*this.xBoxNum+j-this.firstDayWeekIndex+1};
 				}
 				if(i!=0 && days >= this.monthDays){
 					return {flag:'next',text:i*this.xBoxNum+j+1-this.firstDayWeekIndex-this.monthDays};

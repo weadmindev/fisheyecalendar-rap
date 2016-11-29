@@ -94,10 +94,10 @@
           })(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,_this.animationTime,i,j);
           (function(lineCharts,i,j){
             setTimeout(function(){
-              if(hasEnlargeBox && _this.enlargeBox.xIndex != i && _this.enlargeBox.yIndex!=j){
-                _this.setLineChartsSeriesShow(lineCharts,false);
+              if(hasEnlargeBox && (_this.enlargeBox.xIndex != i || _this.enlargeBox.yIndex!=j)){
+                _this.setLineChartsSeriesShow(lineCharts,false,i,j);
               }else{
-                _this.setLineChartsSeriesShow(lineCharts,true);
+                _this.setLineChartsSeriesShow(lineCharts,true,i,j);
               }
             },10*i+10*j);
           })(lineCharts,i,j);
@@ -161,7 +161,7 @@
       var canResponse = true;
       var xIndex = +e.currentTarget.getAttribute('data-xindex');
       var yIndex = +e.currentTarget.getAttribute('data-yindex');
-      if(xIndex*this.xBoxNum+yIndex > this.todayIndex.xIndex*this.xBoxNum+this.todayIndex.yIndex){canResponse = false;}
+      if(this.todayIndex.yIndex>=0 && xIndex*this.xBoxNum+yIndex > this.todayIndex.xIndex*this.xBoxNum+this.todayIndex.yIndex){canResponse = false;}
       return canResponse;
     },
     setEnlargeBox:function(enlargeBox){
@@ -174,45 +174,59 @@
       if(this.todayIndex.xIndex>=0){
         var i = parseInt(this.todayIndex.xIndex);
         var j = parseInt(this.todayIndex.yIndex);
-        this.chartContainerArr[i][j].style.border = '1px solid #C3CC3D';
-        this.chartContainerArr[i][j].style.boxShadow = '0 0 6px 2px #C1EA1C';
+        this.chartContainerArr[i][j].style.border = '1px solid #831FF1';
+        this.chartContainerArr[i][j].style.boxShadow = '0 0 3px 2px #A414C7';
         this.chartContainerArr[i][j].style.zIndex = '99999';
       }
     },
     setLineChartsOptionShow:function(xIndex, yIndex, isShow){
-      this.lineChartsArr[xIndex][yIndex].setOption({
-        legend:{
-          show:isShow
-        },
-        xAxis:[{
-          axisLabel:{show:isShow}
-        }],
-        yAxis:[{
-          axisLabel:{show:isShow}
-        }]
-      });
+      var _this = this;
+      setTimeout(function(){
+        _this.lineChartsArr[xIndex][yIndex].setOption({
+          legend:{
+            show:isShow
+          },
+          xAxis:[{
+            axisLabel:{show:isShow}
+          }],
+          yAxis:[{
+            axisLabel:{show:isShow}
+          }]
+        });
+      },_this.animationTime/2);
     },
-    setLineChartsSeriesShow:function(lineCharts,isShow){
-      lineCharts && lineCharts.setOption({
-        series: [
-            {
-                showSymbol :isShow,
-                lineStyle:{
-                  normal:{
-                    opacity:isShow?1:0
+    setLineChartsSeriesShow:function(lineCharts,isShow,i,j){
+      setTimeout(function(){
+        lineCharts && lineCharts.setOption({
+          yAxis:[{
+            axisTick :{show:isShow},
+            axisLine:{show:isShow}
+          }],
+          xAxis:[{
+            axisTick :{show:isShow},
+            axisLine:{show:isShow}
+          }],
+          series: [
+              {
+                  showSymbol :isShow,
+                  lineStyle:{
+                    normal:{
+                      opacity:isShow?1:0
+                    }
                   }
-                }
-            },
-            {
-                showSymbol :isShow,
-                lineStyle:{
-                  normal:{
-                    opacity:isShow?1:0
+              },
+              {
+                  showSymbol :isShow,
+                  lineStyle:{
+                    normal:{
+                      opacity:isShow?1:0
+                    }
                   }
-                }
-            }
-        ]
-      });
+              }
+          ]
+        });
+      },i*50+j*40);
+
     },
     formatParseData:function(dataList){
         for(var dayNum in dataList){
@@ -230,10 +244,12 @@
     getChartData:function(dayTxt,flag){
         var chartData = {
           backgroundColor: flag=='current' ? '#fff' : '#D8DBE4',
-          animationDurationUpdate:this.animationTime,
+          animationDurationUpdate:this.animationTime/2,
           animationEasingUpdate:'cubicInOut',
           title: {
               text: dayTxt+'',
+              left:'1',
+              top:'0',
               textStyle: {
                 color: '#2d78f4',
                 // fontStyle: 'normal',
@@ -260,7 +276,7 @@
                   id: 'dataZoomY',
                   type: 'inside',
                   yAxisIndex: [0],
-                  filterMode: 'empty'
+                  filterMode: 'filter'
               }
           ],
           xAxis: [
@@ -300,6 +316,7 @@
                   hoverAnimation:false,
                   symbolSize :1,
                   showSymbol :false,
+                  lineStyle:{normal:{width:1}},
                   data:this.parseDataList[dayTxt-1]['package']
               },
               {
@@ -308,6 +325,7 @@
                   symbolSize :1,
                   hoverAnimation:false,
                   showSymbol :false,
+                  lineStyle:{normal:{width:1}},
                   data:this.parseDataList[dayTxt-1]['retime']
               }
           ]
