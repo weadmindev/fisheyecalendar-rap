@@ -2,17 +2,14 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 
 (function() {
 	'use strict';
-
-
 	rap.registerTypeHandler("eclipsesource.piccolo2djs", {
 
 		factory : function(properties) {
 			return new eclipsesource.piccolo2djs(properties);
 		},
-
 		destructor : "destroy",
 		methods : ['showList','updateCalendarByDate'],
-		properties : [ "size",'date'],
+		properties : [ "size",'date','lineColor'],
 		events:[]
 
 	});
@@ -35,7 +32,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			height : 300
 		};
 		this.element.style.width = '100%';//this._size.width+"px";
-    this.element.style.height = '100%';//(this._size.height-20)+"px";
+    this.element.style.height = '100%'; //(this._size.height-20)+"px";
+
 		// calendar chart container
 		this.fishEyeContainer = document.createElement('div');
 		this.fishEyeContainer.style.width = "100%";
@@ -62,7 +60,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		onRender : function() {
       var _this = this;
 			if (this.element.parentNode) {
-				var dt = new Date(this._date);
+				console.log("have the parentNode onRender!!!!");
 				rap.off("render", this.onRender);
 				// Creates the graph inside the given container
 				this.fishEyeCalendar = new FishEyeCalendar({
@@ -89,7 +87,10 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			this._date = obj.date;
 			console.log('setDate:',obj);
 		},
-		showList:function(obj){ // this obj have three key:'prev','current','next'
+		setLineColor:function(obj){
+			console.log('lineColor:',obj);
+		},
+		showList:function(obj){
 			console.log('showList:',obj);
 			this.dataObj = obj;
 		},
@@ -117,7 +118,9 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			rap.off("send", this.onSend);
 			this.element.parentNode.removeChild(this.element);
 		},
+
 		layout : function() {
+			// console.log("piccolo2djs...layout..")
 			if (this.ready) {
 				var area = this.parent.getClientArea();
         console.log("this.parent.getClientArea():",area);
