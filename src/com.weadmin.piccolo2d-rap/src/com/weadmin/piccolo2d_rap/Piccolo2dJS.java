@@ -7,10 +7,14 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
-import org.eclipse.rap.json.JsonArray;
 import org.eclipse.rap.json.JsonObject;
 import org.eclipse.swt.widgets.Composite;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
 
 public class Piccolo2dJS extends SVWidgetBase{
 
@@ -20,87 +24,167 @@ public class Piccolo2dJS extends SVWidgetBase{
 		super(parent, style);
 	}
 
+	public void setLineColor(JSONObject json){
+		super.setRemoteProp("lineColor", JsonObject.readFrom(json.toJSONString()));
+	}
 
 	@SuppressWarnings("deprecation")
-	public static JsonObject setDate(Date date){
-		JsonObject parameters = new JsonObject();
-		parameters.add("date", new SimpleDateFormat("yyyy-MM-dd").format(date));
+	public static String setDate(Date date){
+		JSONObject parameters = new JSONObject();
+		parameters.put("date", new SimpleDateFormat("yyyy-MM-dd").format(date));
 		Date current = new Date();
 		if (date.getMonth() == current.getMonth()) {
-			parameters.add("currentDay", current.getDate());
+			parameters.put("currentDay", current.getDate());
 		}else{
-			parameters.add("currentDay", -1);
+			parameters.put("currentDay", -1);
 		}
-		return parameters;
+		return parameters.toJSONString();
 	}
 
-	public void showList(Date date,List<JsonObject> list){
-		super.setRemoteProp("date", setDate(date));
+	public void showList(Date date,List<JSONObject> list){
+		super.setRemoteProp("date", JsonObject.readFrom(setDate(date)));
 		listSort(list);
-		super.callRemoteMethod("showList", dealWithData(date,list));
+		super.callRemoteMethod("showList", JsonObject.readFrom(dealWithList(date,list)));
 	}
-
-	@SuppressWarnings("deprecation")
-	public static JsonObject dealWithData(Date date,List<JsonObject> list){
+	
+	@SuppressWarnings({ "deprecation", "rawtypes" })
+	public static String dealWithList(Date date, List<JSONObject> list){
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		int month = calendar.get(Calendar.MONTH)+1;   //the month of search data
-		String day,dd = null;
-		Date d = null;
+		JSONObject json_line,json_lines = null;
+		JSONArray array_line,arrary_data,array_axis = null;
+		JSONObject data = new JSONObject();
+		JSONObject prev = new JSONObject();
+		JSONObject current = new JSONObject();
+		JSONObject next = new JSONObject();
+		Date dd = null;
+		boolean flag = false;
 		int x,dataMonth = 0;
-		JsonArray temp_package_array,temp_retime_array = null;
-		JsonObject temp = null;
-		JsonObject data = new JsonObject();
-		JsonObject json1 = new JsonObject();
-		JsonObject json2 = new JsonObject();
-		JsonObject json3 = new JsonObject();
-		for(JsonObject json:list){
-			dd = json.get("savetime").asString();
-			d = stringToDate(dd);
-			x = d.getHours()*60 + d.getMinutes();
-			temp_package_array = new JsonArray();
-			temp_retime_array = new JsonArray();
-			temp_package_array.add(x).add(Double.valueOf(json.get("package").asString()));
-			temp_retime_array.add(x).add(Double.valueOf(json.get("retime").asString()));
-			temp = new JsonObject();
-			temp.add("savetime", dd);
-			temp.add("package", temp_package_array);
-			temp.add("retime", temp_retime_array);
-			day = String.valueOf(d.getDate());
-			dataMonth = d.getMonth()+1;
-			if (dataMonth < month) { //previous month
-				if (json1.get(day)!=null) {
-					json1.set(day, ((JsonArray)json1.get(day)).add(temp));
-				}else{
-					json1.add(day, new JsonArray().add(temp));
-				}
-			}
-			if (dataMonth == month) {//middle month
-				if (json2.get(day)!=null) {
-					json2.set(day, ((JsonArray)json2.get(day)).add(temp));
-				}else{
-					json2.add(day, new JsonArray().add(temp));
-				}
-			}
-			if (dataMonth > month) {//next month
-				if (json3.get(day)!=null) {
-					json3.set(day, ((JsonArray)json3.get(day)).add(temp));
-				}else{
-					json3.add(day, new JsonArray().add(temp));
+		Double y;
+		String jsonKey,day = null;
+		for(JSONObject json:list){
+			dd = json.getDate("savetime");
+			dataMonth = dd.getMonth()+1;    //the month of searching data
+			for(Iterator it = json.keySet().iterator();it.hasNext();){
+				jsonKey = (String) it.next();
+				if (!jsonKey.equals("savetime")) {
+					flag = false;
+					x = dd.getHours()*60+dd.getMinutes();   //x-axis
+					y = json.getDouble(jsonKey);           //y-axis
+					array_axis = new JSONArray();
+					array_axis.add(x);
+					array_axis.add(y);
+					day = String.valueOf(dd.getDate());
+					if (dataMonth < month) {              //previous month
+						if (prev.containsKey(day)) {
+							array_line = prev.getJSONArray(day);
+							for(int i=0;i<array_line.size();i++){
+								json_line = (JSONObject) array_line.get(i);
+								if (json_line.getString("name").equals(jsonKey)) {
+									arrary_data = json_line.getJSONArray("data");
+									arrary_data.add(array_axis);
+									flag = true;
+									break;
+								}
+							}
+							if (!flag) {
+								json_lines = new JSONObject();
+								json_lines.put("name", jsonKey);
+								arrary_data = new JSONArray();
+								arrary_data.add(array_axis);
+								json_lines.put("data", arrary_data);
+								array_line.add(json_lines);
+							}
+						}else{
+							json_line = new JSONObject();			//line
+							json_line.put("name", jsonKey);
+							arrary_data = new JSONArray();
+							arrary_data.add(array_axis);
+							json_line.put("data", arrary_data);
+							array_line = new JSONArray();
+							array_line.add(json_line);
+							prev.put(day, array_line);
+						}
+					}
+					if (dataMonth == month) {                     //current month
+						if (current.containsKey(day)) {
+							json_lines = null;
+							array_line = current.getJSONArray(day);
+							for(int i=0;i<array_line.size();i++){
+								json_line = (JSONObject) array_line.get(i);
+								if (json_line.getString("name").equals(jsonKey)) {
+									arrary_data = json_line.getJSONArray("data");
+									arrary_data.add(array_axis);
+									flag = true;
+									break;
+								}
+							}
+							if (!flag) {
+								json_lines = new JSONObject();
+								json_lines.put("name", jsonKey);
+								arrary_data = new JSONArray();
+								arrary_data.add(array_axis);
+								json_lines.put("data", arrary_data);
+								array_line.add(json_lines);
+							}
+						}else{
+							json_line = new JSONObject();			//line
+							json_line.put("name", jsonKey);
+							arrary_data = new JSONArray();
+							arrary_data.add(array_axis);
+							json_line.put("data", arrary_data);
+							array_line = new JSONArray();
+							array_line.add(json_line);
+							current.put(day, array_line);
+						}
+					}
+					if (dataMonth > month) {                       //next month
+						if (next.containsKey(day)) {
+							json_lines = null;
+							array_line = next.getJSONArray(day);
+							for(int i=0;i<array_line.size();i++){
+								json_line = (JSONObject) array_line.get(i);
+								if (json_line.getString("name").equals(jsonKey)) {
+									arrary_data = json_line.getJSONArray("data");
+									arrary_data.add(array_axis);
+									flag = true;
+									break;
+								}
+							}
+							if (!flag) {
+								json_lines = new JSONObject();
+								json_lines.put("name", jsonKey);
+								arrary_data = new JSONArray();
+								arrary_data.add(array_axis);
+								json_lines.put("data", arrary_data);
+								array_line.add(json_lines);
+							}
+						}else{
+							json_line = new JSONObject();			//line
+							json_line.put("name", jsonKey);
+							arrary_data = new JSONArray();
+							arrary_data.add(array_axis);
+							json_line.put("data", arrary_data);
+							array_line = new JSONArray();
+							array_line.add(json_line);
+							next.put(day, array_line);
+						}
+					}
 				}
 			}
 		}
-		data.add("prev", json1);
-		data.add("current", json2);
-		data.add("next", json3);
-		return data;
+		data.put("prev", prev);
+		data.put("current", current);
+		data.put("next", next);
+		return data.toJSONString();
 	}
 
-	public static void listSort(List<JsonObject> list){
-		Collections.sort(list,new Comparator<JsonObject>() {//order by savetime
-			public int compare(JsonObject json1,JsonObject json2){
+	public static void listSort(List<JSONObject> list){
+		Collections.sort(list,new Comparator<JSONObject>() {//order by savetime
+			public int compare(JSONObject json1,JSONObject json2){
 				if (json1!=null&&json2!=null) {
-					return json1.get("savetime").asString().compareTo(json2.get("savetime").asString());
+					return json1.getString("savetime").compareTo(json2.getString("savetime"));
 				}
 				return 0;
 			}

@@ -6,4 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: WEADMIN
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.rap.rwt;bundle-version="3.1.0"
-Export-Package: com.weadmin.piccolo2d_rap
+Export-Package: com.alibaba.fastjson,
+ com.weadmin.piccolo2d_rap
+Bundle-ClassPath: lib/fastjson-1.1.37.jar,
+ .
