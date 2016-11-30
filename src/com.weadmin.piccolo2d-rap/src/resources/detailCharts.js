@@ -61,7 +61,7 @@
       }
       this.setTodayBoxBorderColor();
     },
-    setPosition:function(leftTopPointArr,isInit){
+    setPosition:function(leftTopPointArr){
       var _this = this;
       this.leftTopPointArr = leftTopPointArr;
       var hasEnlargeBox = this.hasEnlargeBox();
@@ -102,6 +102,11 @@
             },10*i+10*j);
           })(lineCharts,i,j);
         }
+      }
+    },
+    updateOptions:function(options){
+      for(var key in options){
+        this[key] = options[key];
       }
     },
     addEvent:function(){

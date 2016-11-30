@@ -34,9 +34,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			width : 300,
 			height : 300
 		};
-		this.element.style.width = this._size.width+"px";
-    this.element.style.height = (this._size.height-20)+"px";
-
+		this.element.style.width = '100%';//this._size.width+"px";
+    this.element.style.height = '100%';//(this._size.height-20)+"px";
 		// calendar chart container
 		this.fishEyeContainer = document.createElement('div');
 		this.fishEyeContainer.style.width = "100%";
@@ -44,8 +43,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		this.element.appendChild(this.fishEyeContainer);
 		//
 		this.detailChartContainer = document.createElement('div');
-		// this.detailChartContainer.style.width = "100%";
-		// this.detailChartContainer.style.height = "100%";
+		this.detailChartContainer.style.width = "100%";
+		this.detailChartContainer.style.height = "100%";
 		this.element.appendChild(this.detailChartContainer);
 
 		rap.on("render", this.onRender);
@@ -141,23 +140,21 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			var _this = this;
 			if (this.ready) {
 				async(this, function() { // Needed by IE for some reason
+					console.log('async:size',size);
 					_this._size = size;
 					_this.element.style.width = size.width+"px";
 			    _this.element.style.height = (size.height-20)+"px";
-					_this.fishEyeCalendar.refreshAll();
+					_this.fishEyeCalendar.refreshAll(_this._size);
 				});
 			} else {
 				this._size = size;
 			}
 		},
-
 		destroy : function() {
 			rap.off("send", this.onSend);
 			this.element.parentNode.removeChild(this.element);
 		},
-
 		layout : function() {
-			console.log("piccolo2djs...layout..")
 			if (this.ready) {
 				var area = this.parent.getClientArea();
         console.log("this.parent.getClientArea():",area);
@@ -166,7 +163,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				this.element.style.width = area[2] + "px";
 				this.element.style.height = area[3] + "px";
 				this._size = {width:area[2],height:area[3]};
-				this.fishEyeCalendar.refreshAll();
+				this.fishEyeCalendar.refreshAll(this._size);
 			}
 		}
 
