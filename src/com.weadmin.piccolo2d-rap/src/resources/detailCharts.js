@@ -202,6 +202,21 @@
       },_this.animationTime/2);
     },
     setLineChartsSeriesShow:function(lineCharts,isShow,i,j){
+      var leftTop = this.leftTopPointArr[i][j];
+      var seriesList = [];
+      if(this.dataObj[leftTop.flag] && this.dataObj[leftTop.flag][leftTop.text]){
+        var linesArr = this.dataObj[leftTop.flag][leftTop.text];
+        for(var i=0;i<linesArr.length;i++){
+          seriesList.push({
+            showSymbol :isShow,
+            lineStyle:{
+              normal:{
+                opacity:isShow?1:0
+              }
+            }
+          });
+        }
+      }
       setTimeout(function(){
         lineCharts && lineCharts.setOption({
           yAxis:[{
@@ -212,24 +227,7 @@
             axisTick :{show:isShow},
             axisLine:{show:isShow}
           }],
-          series: [
-              {
-                  showSymbol :isShow,
-                  lineStyle:{
-                    normal:{
-                      opacity:isShow?1:0
-                    }
-                  }
-              },
-              {
-                  showSymbol :isShow,
-                  lineStyle:{
-                    normal:{
-                      opacity:isShow?1:0
-                    }
-                  }
-              }
-          ]
+          series: seriesList
         });
       },i*50+j*40);
 
@@ -249,6 +247,9 @@
     },
     getlegendListByDay:function(dayTxt,flag){
       var arr = [];
+      if(!this.dataObj[flag] || !this.dataObj[flag][dayTxt]){
+        return arr;
+      }
       var linesArr = this.dataObj[flag][dayTxt];
       for(var i=0;i<linesArr.length;i++){
         var nameCn = this.lineDescMap[linesArr[i]['name']];
@@ -258,6 +259,9 @@
     },
     getLineSeriesData:function(dayTxt,flag,legendDescArr){
       var seriesList = [];
+      if(!this.dataObj[flag] || !this.dataObj[flag][dayTxt]){
+        return seriesList;
+      }
       var linesArr = this.dataObj[flag][dayTxt];
       for(var i=0;i<linesArr.length;i++){
         seriesList.push({
