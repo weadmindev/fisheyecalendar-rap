@@ -7,6 +7,7 @@ import java.util.List;
 import org.eclipse.rap.json.JsonObject;
 import org.eclipse.rap.rwt.application.AbstractEntryPoint;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.Composite;
 
 import com.weadmin.piccolo2d_rap.Piccolo2dJS;
@@ -18,9 +19,10 @@ public class ExampleOne extends AbstractEntryPoint{
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Override
 	protected void createContents(Composite parent) {
-		parent.setLayout(null);
+		parent.setLayout(new FillLayout(SWT.VERTICAL));
+//		parent.setLayout(null);
 		Piccolo2dJS pjs = new Piccolo2dJS(parent, SWT.NONE);
-		pjs.setBounds(20, 0, 1000, 600);
+//		pjs.setBounds(20, 0, 1000, 600);
 		Date date = new Date("2016/11/29");
 		pjs.showList(date,dataModle(date));
 	}

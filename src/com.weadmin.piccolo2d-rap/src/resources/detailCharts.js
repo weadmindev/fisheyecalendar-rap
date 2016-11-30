@@ -8,7 +8,7 @@
       this.zrender = options.zrender;
       this.echarts = options.echarts;
       this.container = options.container;
-      this.dataList = options.dataList;
+      this.dataObj = options.dataObj;
       this.xBoxNum = options.xBoxNum;
       this.yBoxNum = options.yBoxNum;
       this.xStart = options.xStart;
@@ -25,7 +25,8 @@
       this.parseDataList = [];
       this.canClickEnlarge = true;
       this.animationTime = options.animationTime || 1000; // millisecond.
-      this.formatParseData(this.dataList);
+      this.lineDescMap = {'package':'包成功率(%)','retime':'数据往返时间(ms)'};
+      this.formatParseData(this.dataObj);
       this.initElement();
       this.addEvent();
     },
@@ -179,8 +180,8 @@
       if(this.todayIndex.xIndex>=0){
         var i = parseInt(this.todayIndex.xIndex);
         var j = parseInt(this.todayIndex.yIndex);
-        this.chartContainerArr[i][j].style.border = '1px solid #831FF1';
-        this.chartContainerArr[i][j].style.boxShadow = '0 0 3px 2px #A414C7';
+        // this.chartContainerArr[i][j].style.border = '1px solid #831FF1';
+        this.chartContainerArr[i][j].style.boxShadow = '0 0 3px 2px #831FF1';
         this.chartContainerArr[i][j].style.zIndex = '99999';
       }
     },
@@ -246,11 +247,38 @@
         this.parseDataList.push(this.parseDataList[this.parseDataList.length-1]);
         console.log('this.parseDataList:',this.parseDataList);
     },
+    getlegendListByDay:function(dayTxt,flag){
+      var arr = [];
+      var linesArr = this.dataObj[flag][dayTxt];
+      for(var i=0;i<linesArr.length;i++){
+        var nameCn = this.lineDescMap[linesArr[i]['name']];
+        arr.push(nameCn ? nameCn : linesArr[i]['name']);//if have not chinese name, then use name value.
+      }
+      return arr;
+    },
+    getLineSeriesData:function(dayTxt,flag,legendDescArr){
+      var seriesList = [];
+      var linesArr = this.dataObj[flag][dayTxt];
+      for(var i=0;i<linesArr.length;i++){
+        seriesList.push({
+          name:legendDescArr[i],
+          type:'line',
+          hoverAnimation:false,
+          symbolSize :1,
+          showSymbol :false,
+          lineStyle:{normal:{width:1}},
+          data:linesArr[i]['data']
+        });
+      }
+    },
     getChartData:function(dayTxt,flag){
+      var legendDescArr = this.getlegendListByDay(dayTxt,flag);
+      var seriesList = this.getLineSeriesData(dayTxt,flag,legendDescArr);
         var chartData = {
           backgroundColor: flag=='current' ? '#fff' : '#D8DBE4',
           animationDurationUpdate:this.animationTime/2,
           animationEasingUpdate:'cubicInOut',
+          color:['#6C9EBF','#65EC83','#CEE687','#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3','#E4706C'],
           title: {
               text: dayTxt+'',
               left:'1',
@@ -268,7 +296,7 @@
           // },
           legend: {
             show:false,
-              data:['包成功率(%)', '数据往返时间(ms)']
+              data:legendDescArr
           },
           dataZoom: [
               {
@@ -314,26 +342,7 @@
                   }
               }
           ],
-          series: [
-              {
-                  name:'包成功率(%)',
-                  type:'line',
-                  hoverAnimation:false,
-                  symbolSize :1,
-                  showSymbol :false,
-                  lineStyle:{normal:{width:1}},
-                  data:this.parseDataList[dayTxt-1]['package']
-              },
-              {
-                  name:'数据往返时间(ms)',
-                  type:'line',
-                  symbolSize :1,
-                  hoverAnimation:false,
-                  showSymbol :false,
-                  lineStyle:{normal:{width:1}},
-                  data:this.parseDataList[dayTxt-1]['retime']
-              }
-          ]
+          series: seriesList
         };
         return chartData;
       }
