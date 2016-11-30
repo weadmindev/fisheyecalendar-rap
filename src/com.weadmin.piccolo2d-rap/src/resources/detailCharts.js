@@ -270,6 +270,7 @@
           data:linesArr[i]['data']
         });
       }
+      return seriesList;
     },
     getChartData:function(dayTxt,flag){
       var legendDescArr = this.getlegendListByDay(dayTxt,flag);

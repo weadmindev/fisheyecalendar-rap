@@ -60,8 +60,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		onRender : function() {
       var _this = this;
 			if (this.element.parentNode) {
-				console.log("have the parentNode onRender!!!!");
 				rap.off("render", this.onRender);
+				var dt = new Date(this._date);
 				// Creates the graph inside the given container
 				this.fishEyeCalendar = new FishEyeCalendar({
 					year:dt.getFullYear(),
