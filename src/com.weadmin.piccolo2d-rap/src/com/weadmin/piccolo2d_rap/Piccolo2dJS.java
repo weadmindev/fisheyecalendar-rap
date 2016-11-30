@@ -28,16 +28,10 @@ public class Piccolo2dJS extends SVWidgetBase{
 		super.setRemoteProp("lineColor", JsonObject.readFrom(json.toJSONString()));
 	}
 
-	@SuppressWarnings("deprecation")
 	public static String setDate(Date date){
 		JSONObject parameters = new JSONObject();
 		parameters.put("date", new SimpleDateFormat("yyyy-MM-dd").format(date));
-		Date current = new Date();
-		if (date.getMonth() == current.getMonth()) {
-			parameters.put("currentDay", current.getDate());
-		}else{
-			parameters.put("currentDay", -1);
-		}
+		parameters.put("currentDay", formatDate(new Date()));
 		return parameters.toJSONString();
 	}
 
@@ -200,6 +194,11 @@ public class Piccolo2dJS extends SVWidgetBase{
 			e.printStackTrace();
 		}
 		return date;
+	}
+	
+	public static String formatDate(Date date){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		return sdf.format(date);
 	}
 
 	@Override
