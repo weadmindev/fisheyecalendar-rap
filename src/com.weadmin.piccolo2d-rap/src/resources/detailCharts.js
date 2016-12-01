@@ -90,29 +90,25 @@
             lineCharts && lineCharts.setOption(_this.getChartData(leftTop.text,leftTop.flag));
           }
           (function(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,animationTime,i,j){
+            $(chartContainer).animate({
+              left:curPointX+'px',
+              top:curPointY+'px',
+              width:(nextPointX - curPointX)+'px',
+              height:(nextPointY - curPointY)+'px'
+            },animationTime,'linear');
             setTimeout(function(){
-              $(chartContainer).animate({
-                left:curPointX+'px',
-                top:curPointY+'px',
-                width:(nextPointX - curPointX)+'px',
-                height:(nextPointY - curPointY)+'px'
-              },animationTime,'linear');
-              setTimeout(function(){
-                lineCharts && lineCharts.resize({
-                  width:(nextPointX - curPointX),
-                  height:(nextPointY - curPointY)
-                });
-              },20);
-            },20*i);
+              lineCharts && lineCharts.resize({
+                width:(nextPointX - curPointX),
+                height:(nextPointY - curPointY)
+              });
+            },20);
           })(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,_this.animationTime,i,j);
           (function(lineCharts,i,j){
-            setTimeout(function(){
-              if(hasEnlargeBox && (_this.enlargeBox.xIndex != i || _this.enlargeBox.yIndex!=j)){
-                _this.setLineChartsSeriesShow(lineCharts,false,i,j);
-              }else{
-                _this.setLineChartsSeriesShow(lineCharts,true,i,j);
-              }
-            },10*i+10*j);
+            if(hasEnlargeBox && (_this.enlargeBox.xIndex != i || _this.enlargeBox.yIndex!=j)){
+              _this.setLineChartsSeriesShow(lineCharts,false,i,j);
+            }else{
+              _this.setLineChartsSeriesShow(lineCharts,true,i,j);
+            }
           })(lineCharts,i,j);
         }
       }
@@ -241,7 +237,7 @@
           }],
           series: seriesList
         });
-      },i*50+j*40);
+      },i*50+j*100);
     },
     getlegendListByDay:function(dayTxt,flag){
       var arr = [];
@@ -281,6 +277,7 @@
           backgroundColor: flag=='current' ? '#fff' : '#D8DBE4',
           animationDurationUpdate:this.animationTime/2,
           animationEasingUpdate:'cubicInOut',
+          animation:false,
           color:['#6C9EBF','#65EC83','#CEE687','#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3','#E4706C'],
           title: {
               text: dayTxt+'',
