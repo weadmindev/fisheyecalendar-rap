@@ -21,7 +21,7 @@
         this.month = options.month;
         this.basePath = options.basePath;
 				this.container = options.container;
-				this.dataList = options.dataList;
+				this.dataObj = options.dataObj;
         this.detailContainer = options.detailContainer; //dom container of detail chart
         this.xStart = options.xStart || 10;  //鏁翠釜鍥惧舰鐨剎璧风偣銆�
         this.yStart = options.yStart || 50; //鏁翠釜鍥惧舰鐨剏璧风偣
@@ -81,7 +81,7 @@
 								_this.initCalendarHeader();
 
 								_this.detailCurveCharts = new DetailCurveCharts({
-										dataList:_this.dataList,
+										dataObj:_this.dataObj,
 										xBoxNum:_this.xBoxNum,
 										yBoxNum:_this.yBoxNum,
 										xStart:_this.xStart,
@@ -109,30 +109,31 @@
 	    },
 			initParamsConfig:function(){
         this.width = Math.ceil(this.zr.getWidth())-10;
-        this.height = Math.ceil(this.zr.getHeight())-50;
-        this.enlargeBoxWidth = (this.boxWidthEnlargeRatio * this.width); //the width of the enlarged box
-        this.enlargeBoxHeight = (this.boxHeightEnlargeRatio * this.height); //the height of the enlarged box
-
-        this.xDivision = ((this.width-this.xStart)/this.xBoxNum); //x杞村垎鍓叉垚鍑犱唤锛屾瘡浠界殑瀹藉害銆�
-        this.yDivision = ((this.height-this.yStart)/this.yBoxNum); //y杞村垎鍓叉垚鍑犱唤锛屾瘡浠界殑楂樺害銆�
-        //鏈夋柟妗嗚鏀惧ぇ鏃讹紝x杞村墿浣欏搴﹀垎鍓叉垚n-1浠斤紝姣忎唤鐨勫搴︺��
-        this.xDivisionHasEnlarge = ((this.width-this.enlargeBoxWidth-this.xStart)/this.xBoxNum);
-        this.yDivisionHasEnlarge = ((this.height-this.enlargeBoxHeight-this.yStart)/this.yBoxNum); //y杞村墿浣欓珮搴﹀垎鍓叉垚n-1浠斤紝姣忎唤鐨勯珮搴︺��
-				// this.colLineShapeList = [];
-        // this.rowLineShapeList = [];
-        // this.boxNumTextList = [];
-				this.prevMonthDays = this.getSumDaysOfMonth(this.year,this.month-1); //the total number of days of one month.
-				this.monthDays = this.getSumDaysOfMonth(this.year,this.month); //the total number of days of one month.
-        this.firstDayWeekIndex = this.getWeekDayByDate(this.year,this.month,1); //the first day of one month is day of the week.
+        this.height = Math.ceil(this.zr.getHeight())-10;
+				this.updateParamsAboutSize();
+        this.updateparamsAboutDate();
 				this.setCoordinateAndDayNum();
 				this.detailContainer.setAttribute('id','detailChartContainers');
 				this.detailContainer.style.position = 'absolute';
 				// this.detailContainer.style.border = 'solid 1px #7848F1';
-				this.detailContainer.style.width = (this.width-10)+'px';
-				this.detailContainer.style.height = (this.height-50)+'px';
+				this.detailContainer.style.width = (this.width-this.xStart)+'px';
+				this.detailContainer.style.height = (this.height-this.yStart)+'px';
 				this.detailContainer.style.left = this.xStart+'px';
 				this.detailContainer.style.top = this.yStart+'px';
       },
+			updateParamsAboutSize:function(){
+				this.enlargeBoxWidth = (this.boxWidthEnlargeRatio * this.width); //the width of the enlarged box
+        this.enlargeBoxHeight = (this.boxHeightEnlargeRatio * this.height); //the height of the enlarged box
+        this.xDivision = ((this.width-this.xStart)/this.xBoxNum);
+        this.yDivision = ((this.height-this.yStart)/this.yBoxNum);
+        this.xDivisionHasEnlarge = ((this.width-this.enlargeBoxWidth-this.xStart)/this.xBoxNum);
+        this.yDivisionHasEnlarge = ((this.height-this.enlargeBoxHeight-this.yStart)/this.yBoxNum);
+			},
+			updateparamsAboutDate:function(){
+				this.prevMonthDays = this.getSumDaysOfMonth(this.year,this.month-1); //the total number of days of one month.
+				this.monthDays = this.getSumDaysOfMonth(this.year,this.month); //the total number of days of one month.
+        this.firstDayWeekIndex = this.getWeekDayByDate(this.year,this.month,1); //the first day of one month is day of the week.
+			},
 			setCoordinateAndDayNum:function(){
 				var todayInFlag = '';
 				var todayNum = this.todayDate.getDate();
@@ -267,37 +268,29 @@
 					})(i,xPoint,_this.animationTime);
 				}
 			},
-			refreshShapeByYearMonth:function(year,month){  //change the calendar shape by change the year or month.
-				var _this = this;
-				if(month<=0){ //就当作上一年的最后一个月。
-					year--;
-					month=12;
-				}
+			refreshCalendarByYearMonth:function(year,month){  //change the calendar shape by change the year or month.
 				this.year = +year;
 				this.month = +month;
 				this.enlargeBox.xIndex = -1;
 				this.enlargeBox.yIndex = -1;
-				this.monthDays = this.getSumDaysOfMonth(this.year,this.month);
-        this.firstDayWeekIndex = this.getWeekDayByDate(this.year,this.month,1);
+				this.updateparamsAboutDate();
 				this.refreshTextShape();
-
-				// 	var rowNum = this.leftTopPointArr.length;
-				// 	var colNum = this.leftTopPointArr[0].length;
-				// for(var i=0;i<rowNum;i++){
-				// 	var rowList = this.leftTopPointArr[i];
-				// 	var curPointY = this.leftTopPointArr[i][0]['y'];
-				// 	var nextPointY = (i==rowNum-1) ? this.height : this.leftTopPointArr[i+1][0]['y']; //next Y point coordinate
-				// 	for(var j=0;j<colNum;j++){
-				// 		var curPointX = rowList[j]['x']; //current X point coordinate.
-				// 		var nextPointX = (j==colNum-1) ? this.width : rowList[j+1]['x']; //next X point coordinate.
-				// 		if(rowList[j]['text']){
-				// 			//TODO
-				// 		}
-				// 	}
-				// }
+				this.detailCurveCharts.setPosition(this.leftTopPointArr);
 			},
-			refreshAll:function(){
-
+			refreshAll:function(size){
+				size.width = size.width<800 ? 800 : size.width;
+				size.height = size.height<400 ? 400 : size.height;
+				this.width = size.width-10;
+				this.height = size.height-10;
+				this.updateParamsAboutSize();
+				this.refreshTextShape();
+				this.detailCurveCharts.updateOptions({
+					width:this.width,
+					height:this.height
+				});
+				this.detailContainer.style.width = (this.width-this.xStart)+'px';
+				this.detailContainer.style.height = (this.height-this.yStart)+'px';
+				this.detailCurveCharts.setPosition(this.leftTopPointArr);
 			},
 
 			// draw the base line shape.
