@@ -9,7 +9,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		},
 		destructor : "destroy",
 		methods : ['showList','updateCalendarByDate'],
-		properties : [ "size","dataJson","date","lineColor"],
+		properties : [ "size","dataJson","date","lineColor","isDefaulOpenToday"],
 		events:[]
 
 	});
@@ -26,7 +26,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		this.element = document.createElement("div");
 		this.parent.append(this.element);
 		this.parent.addListener("Resize", this.layout);
-
+		this._isDefaulOpenToday = false;
+		this._dataObj = {current:{},prev:{},next:{}};
 		this._size = properties.size ? properties.size : {
 			width : 300,
 			height : 300
@@ -66,8 +67,9 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				this.fishEyeCalendar = new FishEyeCalendar({
 					year:dt.getFullYear(),
 					month:dt.getMonth()+1,
-					// todayIndex:this._currentDay,
-					dataObj:this.dataObj,
+					currentDay:this._currentDay,
+					isDefaulOpenToday:this._isDefaulOpenToday,
+					dataObj:this._dataObj,
 					basePath:PICCOLO2D_BASEPATH,
 					container:_this.fishEyeContainer,
 					detailContainer:this.detailChartContainer
@@ -85,20 +87,24 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		},
 		setDate:function(obj){
 			this._date = obj.date;
+			this._currentDay = obj.currentDay; //today date string.
 			console.log('setDate:',obj);
 		},
 		setLineColor:function(obj){
 			console.log('lineColor:',obj);
 		},
 		setDataJson:function(obj){
-			this.dataObj = obj;
+			this._dataObj = obj;
 			console.log('setDataJson:',obj);
 		},
-
+		setIsDefaulOpenToday:function(isOpen){
+			this._isDefaulOpenToday = isOpen;
+			console.log('_isDefaulOpenToday:',isOpen);
+		},
 		showList:function(){  //update calendar call
-			// this.dataObj = obj;
+			// this._dataObj = obj;
 			var dt = new Date(this._date);
-			this.fishEyeCalendar && this.fishEyeCalendar.updateCalendarByDateAndData(dt.getFullYear(),dt.getMonth()+1,this.dataObj);
+			this.fishEyeCalendar && this.fishEyeCalendar.updateCalendarByDateAndData(dt.getFullYear(),dt.getMonth()+1,this._dataObj,this._isDefaulOpenToday);
 		},
 		setSize : function(size) {
 			var _this = this;

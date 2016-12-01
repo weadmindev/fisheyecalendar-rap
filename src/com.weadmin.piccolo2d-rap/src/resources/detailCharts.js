@@ -30,6 +30,7 @@
     },
     initElement:function(){
       var i=0,j=0;
+      var hasEnlargeBox = this.hasEnlargeBox();
       for(i = 0; i < this.yBoxNum; i++) {
         this.chartContainerArr.push([]);
         this.lineChartsArr.push([]);
@@ -55,7 +56,14 @@
           ele.setAttribute('data-xindex',i);
           ele.setAttribute('data-yindex',j);
           this.lineChartsArr[i][j] = this.echarts.init(ele, null, {renderer: 'canvas'});
+
           this.lineChartsArr[i][j].setOption(this.getChartData(leftTop.text,leftTop.flag));
+          if(hasEnlargeBox && (this.enlargeBox.xIndex != i || this.enlargeBox.yIndex!=j)){
+            this.setLineChartsSeriesShow(this.lineChartsArr[i][j],false,i,j);
+          }else{
+            this.setLineChartsSeriesShow(this.lineChartsArr[i][j],true,i,j);
+            hasEnlargeBox && this.setLineChartsOptionShow(i,j,true,1);
+          }
         }
       }
       this.setTodayBoxBorderColor();
@@ -189,7 +197,7 @@
         this.chartContainerArr[i][j].style.zIndex = '99999';
       }
     },
-    setLineChartsOptionShow:function(xIndex, yIndex, isShow){
+    setLineChartsOptionShow:function(xIndex, yIndex, isShow,animationTime){
       var _this = this;
       setTimeout(function(){
         _this.lineChartsArr[xIndex][yIndex].setOption({
@@ -203,7 +211,7 @@
             axisLabel:{show:isShow}
           }]
         });
-      },_this.animationTime/2);
+      },animationTime || _this.animationTime/2);
     },
     setLineChartsSeriesShow:function(lineCharts,isShow,i,j){
       var leftTop = this.leftTopPointArr[i][j];
@@ -292,6 +300,11 @@
           legend: {
             show:false,
               data:legendDescArr
+          },
+          grid:{
+            top:'10%',
+            width:'80%',
+            height:'80%'
           },
           dataZoom: [
               {

@@ -19,6 +19,7 @@
         this.boxHeightEnlargeRatio = 0.6;
         this.year = options.year;
         this.month = options.month;
+				this.isDefaulOpenToday = options.isDefaulOpenToday;
         this.basePath = options.basePath;
 				this.container = options.container;
 				this.dataObj = options.dataObj;
@@ -31,7 +32,7 @@
 				this.animationTime = 1000; // millisecond.
 				this.echarts = null;  //
 				this.detailCurveCharts = null;
-				this.todayDate = new Date();
+				this.todayDate = options.currentDay ? new Date(options.currentDay) : new Date();
 				this.todayIndex = {xIndex:-1,yIndex:-1};
         this.initPathsConfig();
         this.initElement();
@@ -111,7 +112,7 @@
         this.width = Math.ceil(this.zr.getWidth())-10;
         this.height = Math.ceil(this.zr.getHeight())-10;
 				this.updateParamsAboutSize();
-        this.updateparamsAboutDate();
+        this.updateParamsAboutDate();
 				this.setCoordinateAndDayNum();
 				this.detailContainer.setAttribute('id','detailChartContainers');
 				this.detailContainer.style.position = 'absolute';
@@ -129,12 +130,13 @@
         this.xDivisionHasEnlarge = ((this.width-this.enlargeBoxWidth-this.xStart)/this.xBoxNum);
         this.yDivisionHasEnlarge = ((this.height-this.enlargeBoxHeight-this.yStart)/this.yBoxNum);
 			},
-			updateparamsAboutDate:function(){
+			updateParamsAboutDate:function(){
 				this.prevMonthDays = this.getSumDaysOfMonth(this.year,this.month-1); //the total number of days of one month.
 				this.monthDays = this.getSumDaysOfMonth(this.year,this.month); //the total number of days of one month.
         this.firstDayWeekIndex = this.getWeekDayByDate(this.year,this.month,1); //the first day of one month is day of the week.
 			},
 			setCoordinateAndDayNum:function(){
+				this.leftTopPointArr = [];
 				var todayInFlag = '';
 				var todayNum = this.todayDate.getDate();
 				if(this.todayDate.getFullYear() == this.year){
@@ -145,7 +147,7 @@
 					}
 				}
 				var i=0,j=0,days=0,dayObj={};
-        for(i = 0; i < this.yBoxNum; i++) {
+				for(i = 0; i < this.yBoxNum; i++) {
           this.leftTopPointArr.push([]);
           for(j=0;j< this.xBoxNum;j++){
 						dayObj = this.getBoxNumText(i,j,days);
@@ -161,6 +163,16 @@
 						};
           }
         }
+				if(this.isDefaulOpenToday && this.todayIndex.xIndex>=0){ //if enlarge today box default, and todayIndex in current show calendar, then update coordinate.
+					this.enlargeBox = {xIndex:this.todayIndex.xIndex,yIndex:this.todayIndex.yIndex};
+					for(i = 0; i < this.yBoxNum; i++) {
+	          for(j=0;j< this.xBoxNum;j++){
+							this.leftTopPointArr[i][j]['x'] = this.getBoxXStart(j);
+	            this.leftTopPointArr[i][j]['y'] = this.getBoxYStart(i);
+	          }
+	        }
+				}
+				this.detailCurveCharts && this.detailCurveCharts.setEnlargeBox(this.enlargeBox);
 				console.log("leftTopPointArr0000:",this.leftTopPointArr);
 			},
 			initCalendarHeader:function(){
@@ -268,14 +280,18 @@
 					})(i,xPoint,_this.animationTime);
 				}
 			},
-			updateCalendarByDateAndData:function(year,month,dataObj){  //change the calendar shape by change the year/month and data.
+			updateCalendarByDateAndData:function(year,month,dataObj,isDefaulOpenToday){  //change the calendar shape by change the year/month and data.
 				this.dataObj = dataObj;
-				this.year = +year;
-				this.month = +month;
-				this.enlargeBox.xIndex = -1;
-				this.enlargeBox.yIndex = -1;
-				this.updateparamsAboutDate();
-				this.refreshTextShape();
+				this.isDefaulOpenToday = isDefaulOpenToday;
+				if(this.year != year || this.month != month){ //if don't change year and month,then just refresh curve charts.
+					this.year = +year;
+					this.month = +month;
+					this.enlargeBox.xIndex = -1;
+					this.enlargeBox.yIndex = -1;
+					this.updateParamsAboutDate();
+					this.setCoordinateAndDayNum();
+				}
+				// this.refreshTextShape();
 				this.detailCurveCharts.setPosition(this.leftTopPointArr,dataObj);
 			},
 			refreshBySize:function(size){
