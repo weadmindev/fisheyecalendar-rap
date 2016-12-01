@@ -31,12 +31,15 @@ public class ExampleOne extends AbstractEntryPoint{
 		
 		Piccolo2dJS pjs = new Piccolo2dJS(parent, SWT.NONE);
 //		pjs.setBounds(20, 0, 1000, 600);
-		Date date = new Date("2016/12/01");
+		Date date = new Date("2016/11/28");
 		pjs.refresh(date,dataModle(date));
 		JSONObject color = new JSONObject();
 		color.put("package", "#8DB6CD");
 //		color.put("retime", "#8B8682");
 		pjs.setLineColor(color);
+		JSONObject isDefaulOpenToday = new JSONObject();
+		isDefaulOpenToday.put("isDefaulOpenToday", false);
+		pjs.setIsDefaulOpenToday(isDefaulOpenToday);
 		pjs.setLayoutData(new GridData(GridData.FILL_BOTH));
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
