@@ -26,7 +26,9 @@ public class Piccolo2dJS extends SVWidgetBase{
 
 	public void refresh(Date date,List<JSONObject> list) {
 		super.setRemoteProp("date", JsonObject.readFrom(setDate(date)));
-		super.setRemoteProp("dataJson", JsonObject.readFrom(dealWithList(date,list)));
+		JsonObject jsonObject = JsonObject.readFrom(dealWithList(date,list));
+		super.setRemoteProp("dataJson", jsonObject);
+		super.callRemoteMethod("showList", jsonObject);
 		
 	}
 	
