@@ -22,11 +22,9 @@
       this.firstDayWeekIndex = options.firstDayWeekIndex;
       this.chartContainerArr = []; //the div container
       this.lineChartsArr = [];
-      this.parseDataList = [];
       this.canClickEnlarge = true;
       this.animationTime = options.animationTime || 1000; // millisecond.
       this.lineDescMap = {'package':'包成功率(%)','retime':'数据往返时间(ms)'};
-      this.formatParseData(this.dataObj);
       this.initElement();
       this.addEvent();
     },
@@ -71,15 +69,18 @@
       var colNum = leftTopPointArr[0].length;
       for(var i=0;i<rowNum;i++){
         var rowList = leftTopPointArr[i];
-        var leftTop = this.leftTopPointArr[i][j];
         var curPointY = leftTopPointArr[i][0]['y']-this.yStart;
         var nextPointY = ((i==rowNum-1) ? this.height : leftTopPointArr[i+1][0]['y']) -this.yStart; //next Y point coordinate
         for(var j=0;j<colNum;j++){
+          var leftTop = this.leftTopPointArr[i][j];
           var curPointX = rowList[j]['x']-this.xStart; //current X point coordinate.
           var nextPointX = ((j==colNum-1) ? this.width : rowList[j+1]['x']) -this.xStart; //next X point coordinate.
           var chartContainer = this.chartContainerArr[i][j];
           var lineCharts = this.lineChartsArr[i][j];
-          dataObj?_this.updateLineChartSeriesDirectly(lineCharts,leftTop.text,leftTop.flag):null;
+          if(dataObj){
+            lineCharts && lineCharts.clear();
+            lineCharts && lineCharts.setOption(_this.getChartData(leftTop.text,leftTop.flag));
+          }
           (function(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,animationTime,i,j){
             setTimeout(function(){
               $(chartContainer).animate({
@@ -233,31 +234,6 @@
           series: seriesList
         });
       },i*50+j*40);
-
-    },
-    formatParseData:function(dataList){
-        for(var dayNum in dataList){
-          var arr = dataList[dayNum];
-          var obj = {'package':[],'retime':[]};
-          for(var i=0;i<arr.length;i++){
-            obj.package.push(arr[i].package);
-            obj.retime.push(arr[i].retime);
-          }
-          this.parseDataList.push(obj);
-        }
-        this.parseDataList.push(this.parseDataList[this.parseDataList.length-1]);
-        console.log('this.parseDataList:',this.parseDataList);
-    },
-    updateLineChartSeriesDirectly:function(lineCharts,dayTxt,flag){
-      var legendDescArr = this.getlegendListByDay(dayTxt,flag);
-      var seriesList = this.getLineSeriesData(dayTxt,flag,legendDescArr);
-      lineCharts && lineCharts.setOption({
-        legend: {
-          show:true,
-          data:legendDescArr
-        },
-        series: seriesList
-      });
     },
     getlegendListByDay:function(dayTxt,flag){
       var arr = [];
