@@ -24,6 +24,12 @@ public class Piccolo2dJS extends SVWidgetBase{
 		super(parent, style);
 	}
 
+	public void refresh(Date date,List<JSONObject> list) {
+		super.setRemoteProp("date", JsonObject.readFrom(setDate(date)));
+		super.setRemoteProp("dataJson", JsonObject.readFrom(dealWithList(date,list)));
+		
+	}
+	
 	public void setLineColor(JSONObject json){
 		super.setRemoteProp("lineColor", JsonObject.readFrom(json.toJSONString()));
 	}
