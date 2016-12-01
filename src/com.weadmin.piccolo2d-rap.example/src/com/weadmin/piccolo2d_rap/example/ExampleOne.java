@@ -6,7 +6,12 @@ import java.util.Date;
 import java.util.List;
 import org.eclipse.rap.rwt.application.AbstractEntryPoint;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 import com.alibaba.fastjson.JSONObject;
@@ -19,17 +24,27 @@ public class ExampleOne extends AbstractEntryPoint{
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Override
 	protected void createContents(Composite parent) {
-		parent.setLayout(new FillLayout(SWT.VERTICAL));
+		parent.setLayout(new GridLayout());
 //		parent.setLayout(null);
+		Button button = new Button(parent, SWT.PUSH);
+		button.setText("Refresh");
+		
 		Piccolo2dJS pjs = new Piccolo2dJS(parent, SWT.NONE);
 //		pjs.setBounds(20, 0, 1000, 600);
 		Date date = new Date("2016/11/29");
-		pjs.showList(date,dataModle(date));
+		pjs.refresh(date,dataModle(date));
 		JSONObject color = new JSONObject();
 		color.put("package", "#8DB6CD");
-		color.put("retime", "#8B8682");
+//		color.put("retime", "#8B8682");
 		pjs.setLineColor(color);
-
+		pjs.setLayoutData(new GridData(GridData.FILL_BOTH));
+		button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				ArrayList list = new ArrayList();
+				pjs.refresh(date,list);
+			}
+		});
 	}
 
 	/**
@@ -53,7 +68,7 @@ public class ExampleOne extends AbstractEntryPoint{
 					json = new JSONObject();
 					json.put("savetime", year+"-"+(month<10?"0"+month:month)+"-"+(i<10?"0"+i:i) + " " +(j<10?"0"+j:j)+":"+getRandom(60)+":"+getRandom(60));
 					json.put("package", getRandom(100));
-					json.put("retime", new java.text.DecimalFormat("#.##").format((double)(Math.random())));
+//					json.put("retime", new java.text.DecimalFormat("#.##").format((double)(Math.random())));
 					list.add(json);
 				}
 			}
