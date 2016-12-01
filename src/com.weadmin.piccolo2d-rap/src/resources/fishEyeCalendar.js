@@ -268,16 +268,17 @@
 					})(i,xPoint,_this.animationTime);
 				}
 			},
-			refreshCalendarByYearMonth:function(year,month){  //change the calendar shape by change the year or month.
+			updateCalendarByDateAndData:function(year,month,dataObj){  //change the calendar shape by change the year/month and data.
+				this.dataObj = dataObj;
 				this.year = +year;
 				this.month = +month;
 				this.enlargeBox.xIndex = -1;
 				this.enlargeBox.yIndex = -1;
 				this.updateparamsAboutDate();
 				this.refreshTextShape();
-				this.detailCurveCharts.setPosition(this.leftTopPointArr);
+				this.detailCurveCharts.setPosition(this.leftTopPointArr,dataObj);
 			},
-			refreshAll:function(size){
+			refreshBySize:function(size){
 				size.width = size.width<800 ? 800 : size.width;
 				size.height = size.height<400 ? 400 : size.height;
 				this.width = size.width-10;

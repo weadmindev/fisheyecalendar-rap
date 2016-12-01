@@ -62,7 +62,8 @@
       }
       this.setTodayBoxBorderColor();
     },
-    setPosition:function(leftTopPointArr){
+    setPosition:function(leftTopPointArr,dataObj){
+      dataObj ? (this.dataObj = dataObj) : null;
       var _this = this;
       this.leftTopPointArr = leftTopPointArr;
       var hasEnlargeBox = this.hasEnlargeBox();
@@ -70,6 +71,7 @@
       var colNum = leftTopPointArr[0].length;
       for(var i=0;i<rowNum;i++){
         var rowList = leftTopPointArr[i];
+        var leftTop = this.leftTopPointArr[i][j];
         var curPointY = leftTopPointArr[i][0]['y']-this.yStart;
         var nextPointY = ((i==rowNum-1) ? this.height : leftTopPointArr[i+1][0]['y']) -this.yStart; //next Y point coordinate
         for(var j=0;j<colNum;j++){
@@ -77,6 +79,7 @@
           var nextPointX = ((j==colNum-1) ? this.width : rowList[j+1]['x']) -this.xStart; //next X point coordinate.
           var chartContainer = this.chartContainerArr[i][j];
           var lineCharts = this.lineChartsArr[i][j];
+          dataObj?_this.updateLineChartSeriesDirectly(lineCharts,leftTop.text,leftTop.flag):null;
           (function(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,animationTime,i,j){
             setTimeout(function(){
               $(chartContainer).animate({
@@ -244,6 +247,17 @@
         }
         this.parseDataList.push(this.parseDataList[this.parseDataList.length-1]);
         console.log('this.parseDataList:',this.parseDataList);
+    },
+    updateLineChartSeriesDirectly:function(lineCharts,dayTxt,flag){
+      var legendDescArr = this.getlegendListByDay(dayTxt,flag);
+      var seriesList = this.getLineSeriesData(dayTxt,flag,legendDescArr);
+      lineCharts && lineCharts.setOption({
+        legend: {
+          show:true,
+          data:legendDescArr
+        },
+        series: seriesList
+      });
     },
     getlegendListByDay:function(dayTxt,flag){
       var arr = [];

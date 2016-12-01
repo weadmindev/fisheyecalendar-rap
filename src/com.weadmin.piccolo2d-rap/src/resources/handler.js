@@ -9,7 +9,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		},
 		destructor : "destroy",
 		methods : ['showList','updateCalendarByDate'],
-		properties : [ "size",'date','lineColor'],
+		properties : [ "size","dataJson","date","lineColor"],
 		events:[]
 
 	});
@@ -78,7 +78,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				// this.layout();
 			}
 		},
-		onSend : function() { //要浏览器客户端任何一个操作就会触发。
+		onSend : function() {
 			// rap.getRemoteObject( this ).set( "model", "123456789"); //设置后端的值，还有其他两个方法:call(method,properties):调用后端的方法,notify(event,properties);
 			// rap.getRemoteObject( this ).call( "handleCallRefreshData", "123456789"); //设置后端的值，还有其他两个方法:call(method,properties):调用后端的方法,notify(event,properties);
 			console.log("mxgraph...onSend..")
@@ -90,9 +90,15 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		setLineColor:function(obj){
 			console.log('lineColor:',obj);
 		},
-		showList:function(obj){
-			console.log('showList:',obj);
+		setDataJson:function(obj){
 			this.dataObj = obj;
+			console.log('setDataJson:',obj);
+		},
+
+		showList:function(){  //update calendar call
+			// this.dataObj = obj;
+			var dt = new Date(this._date);
+			this.fishEyeCalendar && this.fishEyeCalendar.updateCalendarByDateAndData(dt.getFullYear(),dt.getMonth()+1,this.dataObj);
 		},
 		setSize : function(size) {
 			var _this = this;
@@ -103,16 +109,11 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 					console.log('async:size',size);
 					_this.element.style.width = size.width+"px";
 					_this.element.style.height = (size.height-20)+"px";
-					_this.fishEyeCalendar.refreshAll(_this._size);
+					_this.fishEyeCalendar.refreshBySize(_this._size);
 				});
 			} else {
 				this._size = size;
 			}
-		},
-		updateCalendarByDate:function(obj){
-			this._date = obj.date;
-			var dt = new Date(obj.date);
-			this.fishEyeCalendar.refreshCalendarByYearMonth(dt.getFullYear(),dt.getMonth()+1);
 		},
 		destroy : function() {
 			rap.off("send", this.onSend);
@@ -129,7 +130,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				this.element.style.width = area[2] + "px";
 				this.element.style.height = area[3] + "px";
 				this._size = {width:area[2],height:area[3]};
-				this.fishEyeCalendar.refreshAll(this._size);
+				this.fishEyeCalendar.refreshBySize(this._size);
 			}
 		}
 
