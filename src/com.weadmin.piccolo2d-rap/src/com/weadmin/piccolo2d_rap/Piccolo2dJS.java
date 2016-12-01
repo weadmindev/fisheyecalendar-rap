@@ -49,11 +49,15 @@ public class Piccolo2dJS extends SVWidgetBase{
 		super.callRemoteMethod("showList", JsonObject.readFrom(dealWithList(date,list)));
 	}
 	
+	public void setIsDefaulOpenToday(JSONObject json){
+		super.setRemoteProp("isDefaulOpenToday", JsonObject.readFrom(json.toJSONString()));
+	}
+	
 	@SuppressWarnings({ "deprecation", "rawtypes" })
 	public static String dealWithList(Date date, List<JSONObject> list){
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
-		int month = calendar.get(Calendar.MONTH)+1;   //the month of search data
+		Date nowDate = formatDateNoDay(calendar.getTime());
 		JSONObject json_line,json_lines = null;
 		JSONArray array_line,arrary_data,array_axis = null;
 		JSONObject data = new JSONObject();
@@ -62,12 +66,13 @@ public class Piccolo2dJS extends SVWidgetBase{
 		JSONObject next = new JSONObject();
 		Date dd = null;
 		boolean flag = false;
-		int x,dataMonth = 0;
+		int x = 0;
+		Date dataDate = null;
 		Double y;
 		String jsonKey,day = null;
 		for(JSONObject json:list){
 			dd = json.getDate("savetime");
-			dataMonth = dd.getMonth()+1;    //the month of searching data
+			dataDate = formatDateNoDay(dd);
 			for(Iterator it = json.keySet().iterator();it.hasNext();){
 				jsonKey = (String) it.next();
 				if (!jsonKey.equals("savetime")) {
@@ -78,7 +83,7 @@ public class Piccolo2dJS extends SVWidgetBase{
 					array_axis.add(x);
 					array_axis.add(y);
 					day = String.valueOf(dd.getDate());
-					if (dataMonth < month) {              //previous month
+					if (dataDate.before(nowDate)) {              //previous month
 						if (prev.containsKey(day)) {
 							array_line = prev.getJSONArray(day);
 							for(int i=0;i<array_line.size();i++){
@@ -109,7 +114,7 @@ public class Piccolo2dJS extends SVWidgetBase{
 							prev.put(day, array_line);
 						}
 					}
-					if (dataMonth == month) {                     //current month
+					if (dataDate.equals(nowDate)) {                     //current month
 						if (current.containsKey(day)) {
 							json_lines = null;
 							array_line = current.getJSONArray(day);
@@ -141,7 +146,7 @@ public class Piccolo2dJS extends SVWidgetBase{
 							current.put(day, array_line);
 						}
 					}
-					if (dataMonth > month) {                       //next month
+					if (dataDate.after(nowDate)) {                       //next month
 						if (next.containsKey(day)) {
 							json_lines = null;
 							array_line = next.getJSONArray(day);
@@ -193,15 +198,15 @@ public class Piccolo2dJS extends SVWidgetBase{
 		});
 	}
 
-	public static Date stringToDate(String s){
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date date = null;
+	public static Date formatDateNoDay(Date date){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+		Date date2 = null;
 		try {
-			date = sdf.parse(s);
+			date2 = sdf.parse(sdf.format(date));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		return date;
+		return date2;
 	}
 	
 	public static String formatDate(Date date){
