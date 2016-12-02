@@ -24,8 +24,8 @@
 				this.container = options.container;
 				this.dataObj = options.dataObj;
         this.detailContainer = options.detailContainer; //dom container of detail chart
-        this.xStart = options.xStart || 10;  //鏁翠釜鍥惧舰鐨剎璧风偣銆�
-        this.yStart = options.yStart || 50; //鏁翠釜鍥惧舰鐨剏璧风偣
+        this.xStart = options.xStart || 10;
+        this.yStart = options.yStart || 50;
         this.enlargeBox = {xIndex:-1,yIndex:-1}; //
 				this.headerTextList = []; //
 				this.leftTopPointArr = []; //the left and top point of each box ,and the day number of the month.
@@ -47,40 +47,22 @@
 								'echarts/chart/line':this.basePath+'echarts.min',
 								'echarts/component/legend':this.basePath+'echarts.min',
 								'echarts/component/grid':this.basePath+'echarts.min',
-								'echarts/component/dataZoomInside':this.basePath+'echarts.min',
-                'zrender/shape/Rectangle' : this.basePath+'zrender',
-                'zrender/shape/Line' : this.basePath+'zrender',
-                'zrender/shape/Text' : this.basePath+'zrender'
+								'echarts/component/dataZoomInside':this.basePath+'echarts.min'
             }
         });
       },
 	    initElement:function(){
         var _this = this;
         require(['zrender',
-            'zrender/shape/Rectangle',
-            'zrender/shape/Line',
-            'zrender/shape/Text',
 						'echarts',
             'echarts/chart/line',
             'echarts/component/legend',
             'echarts/component/grid',
             'echarts/component/tooltip'
-          ],function(zrender,RectangleShape,LineShape,TextShape,echarts) {
+          ],function(zrender,echarts) {
 								_this.echarts = echarts;
-                _this.zr = zrender.init(_this.container);
-                _this.color = require('zrender/tool/color');
-                _this.guid = require('zrender/tool/guid');
-                _this.RectangleShape = RectangleShape;//require('zrender/shape/Rectangle');
-                _this.LineShape = LineShape;//require('zrender/shape/Line');
-                _this.TextShape = TextShape;//require('zrender/shape/Text');
-                var colorIdx = 0;
-                var color=_this.color;
-                var guid=_this.guid;
-                var zr=_this.zr,xBoxNum = _this.xBoxNum, yBoxNum = _this.yBoxNum;
-                var xStart=_this.xStart,yStart=_this.yStart;
                 _this.initParamsConfig();
 								_this.initCalendarHeader();
-
 								_this.detailCurveCharts = new DetailCurveCharts({
 										dataObj:_this.dataObj,
 										xBoxNum:_this.xBoxNum,
@@ -89,7 +71,6 @@
 										yStart:_this.yStart,
 										width:_this.width,
 										height:_this.height,
-										zrender:zrender,
 										echarts:echarts,
 										container:_this.detailContainer,
 										enlargeBox:_this.enlargeBox,
@@ -102,16 +83,12 @@
 										}
 									});
 								// _this.detailCurveCharts.setPosition(_this.leftTopPointArr,true);
-								_this.addEvent();
-                _this.zr.render(function(){
-                  // after render callback!!
-                });
             }
         )
 	    },
 			initParamsConfig:function(){
-        this.width = Math.ceil(this.zr.getWidth())-10;
-        this.height = Math.ceil(this.zr.getHeight())-10;
+        this.width = Math.ceil($(this.container).width())-10;
+        this.height = Math.ceil($(this.container).height())-10;
 				this.updateParamsAboutSize();
         this.updateParamsAboutDate();
 				this.setCoordinateAndDayNum();
@@ -124,12 +101,12 @@
 				this.detailContainer.style.top = this.yStart+'px';
       },
 			updateParamsAboutSize:function(){
-				this.enlargeBoxWidth = (this.boxWidthEnlargeRatio * this.width); //the width of the enlarged box
-        this.enlargeBoxHeight = (this.boxHeightEnlargeRatio * this.height); //the height of the enlarged box
-        this.xDivision = ((this.width-this.xStart)/this.xBoxNum);
-        this.yDivision = ((this.height-this.yStart)/this.yBoxNum);
-        this.xDivisionHasEnlarge = ((this.width-this.enlargeBoxWidth-this.xStart)/this.xBoxNum);
-        this.yDivisionHasEnlarge = ((this.height-this.enlargeBoxHeight-this.yStart)/this.yBoxNum);
+				this.enlargeBoxWidth = this.boxWidthEnlargeRatio * this.width; //the width of the enlarged box
+        this.enlargeBoxHeight = this.boxHeightEnlargeRatio * this.height; //the height of the enlarged box
+        this.xDivision = (this.width-this.xStart)/this.xBoxNum;
+        this.yDivision = (this.height-this.yStart)/this.yBoxNum;
+        this.xDivisionHasEnlarge = (this.width-this.enlargeBoxWidth-this.xStart)/this.xBoxNum;
+        this.yDivisionHasEnlarge = (this.height-this.enlargeBoxHeight-this.yStart)/this.yBoxNum;
 			},
 			updateParamsAboutDate:function(){
 				this.prevMonthDays = this.getSumDaysOfMonth(this.year,this.month-1); //the total number of days of one month.
@@ -180,23 +157,16 @@
 				var firstRowPointArr = this.leftTopPointArr[0];
 				var calendarHeaderDescArr = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 				for(var i = 0; i < firstRowPointArr.length; i++){
+					var $el = $('<div class="calendarHeader">'+calendarHeaderDescArr[i]+'</div>');
 					var endPoint = (i==firstRowPointArr.length-1) ? this.width : firstRowPointArr[i+1]['x'];
 					var offsetX = (endPoint-firstRowPointArr[i]['x'])/2;
-					this.headerTextList[i] = this.drawTextShape({
-						x:firstRowPointArr[i]['x'] + offsetX,
-						y:firstRowPointArr[i]['y']-15,
-						text: calendarHeaderDescArr[i],
-						textAlign:'center',
-						textFont:'normal 14px verdana'
-					});
-					this.zr.addShape(this.headerTextList[i]);
+					$el.css('left',(firstRowPointArr[i]['x'] + offsetX)+'px');
+					this.container.appendChild($el[0]);
+					this.headerTextList[i] = $el;
 				}
 			},
       addEvent:function(){
 				var _this = this;
-				this.zr.on('click', function(params) {
-					// _this.zr.refresh();
-				});
       },
 			getBoxNumText:function(i,j,days){ //get the day number in some box.
 				if(i==0 && this.firstDayWeekIndex>j){
@@ -222,7 +192,7 @@
       hasEnlargeBox:function(){ //Whether has the enlarged box.
         return (this.enlargeBox.xIndex >= 0 && this.enlargeBox.yIndex >= 0) ? true : false;
       },
-      getBoxXStart:function(index){ //get the box x axis start point by box index.
+      getBoxXStart:function(index){ //get the x axis of box start point by box index.
         var boxXStart = 0;
         if(this.hasEnlargeBox()){
           if(index <= this.enlargeBox.yIndex){
@@ -235,7 +205,7 @@
         }
         return boxXStart;
       },
-      getBoxYStart:function(index){ //寰楀埌灏忔柟妗嗙殑y杞寸殑璧风偣銆�
+      getBoxYStart:function(index){ //
         var boxYStart = 0;
         if(this.hasEnlargeBox()){
           if(index <= this.enlargeBox.xIndex){
@@ -249,10 +219,10 @@
         return boxYStart;
       },
 			refreshAllOnClick:function(clickXIndex,clickYIndex){
-				var _this = this;
-				_this.setEnlargeBoxIndex(clickXIndex,clickYIndex);
-				_this.refreshTextShape();
-				_this.detailCurveCharts.setPosition(_this.leftTopPointArr);
+				this.setEnlargeBoxIndex(clickXIndex,clickYIndex);
+				this.refreshTextShape();
+				this.refreshCalendarHeader();
+				this.detailCurveCharts.setPosition(this.leftTopPointArr);
 			},
 			refreshTextShape:function(){
 				var _this = this;
@@ -267,18 +237,18 @@
 						this.leftTopPointArr[i][j]['text'] = dayObj.text;
 					}
 				}
+			},
+			refreshCalendarHeader:function(){
 				//refresh calendar header's position of week text.
 				var firstRowPointArr = this.leftTopPointArr[0];
 				for(i = 0; i < firstRowPointArr.length; i++){
 					var endPoint = (i==firstRowPointArr.length-1) ? this.width : firstRowPointArr[i+1]['x'];
 					var offsetX = (endPoint-firstRowPointArr[i]['x'])/2;
 					var xPoint = firstRowPointArr[i]['x'] + offsetX;
-					(function(index,xPoint,animationTime){
-						var headerText = _this.headerTextList[index];
-						_this.zr.animate(headerText.id,'style').when(animationTime,{
-							x:xPoint
-						}).start();
-					})(i,xPoint,_this.animationTime);
+					var headerText = this.headerTextList[i];
+					headerText.animate({
+						left:xPoint+'px'
+					},this.animationTime,'linear');
 				}
 			},
 			updateCalendarByDateAndData:function(year,month,dataObj,isDefaulOpenToday){  //change the calendar shape by change the year/month and data.
@@ -291,6 +261,7 @@
 					this.enlargeBox.yIndex = -1;
 					this.updateParamsAboutDate();
 					this.setCoordinateAndDayNum();
+					this.refreshCalendarHeader();
 				}
 				// this.refreshTextShape();
 				this.detailCurveCharts.setPosition(this.leftTopPointArr,dataObj);
@@ -302,6 +273,7 @@
 				this.height = size.height-10;
 				this.updateParamsAboutSize();
 				this.refreshTextShape();
+				this.refreshCalendarHeader();
 				this.detailCurveCharts.updateOptions({
 					width:this.width,
 					height:this.height
@@ -310,69 +282,6 @@
 				this.detailContainer.style.height = (this.height-this.yStart)+'px';
 				this.detailCurveCharts.setPosition(this.leftTopPointArr);
 			},
-
-			// draw the base line shape.
-			drawLineShape:function(config){
-				return new this.LineShape({
-						id : this.guid(),
-						style : {
-							xStart:config.xStart,
-							yStart:config.yStart,
-							xEnd:config.xEnd,
-							yEnd:config.yEnd,
-							strokeColor: this.color.getColor(5),
-							lineType :'solid',
-							zlevel:1,
-							lineWidth:1
-						}
-				});
-			},
-      drawTextShape:function(config){
-        return new this.TextShape({
-					hoverable : false,
-          style:{
-            x:config.x,
-            y:config.y,
-            color:'blue',
-            text:config.text,
-            textAlign:config.textAlign || 'left',
-						textFont:config.textFont||null,
-						// brushType:'stroke',
-						// strokeColor:'red',
-            textBaseLine:'bottom'
-          },
-          // hoverable:true,
-          zlevel:2
-        });
-      },
-      drawRectangleShape:function(config){
-				var _this=this;
-				return new this.RectangleShape({
-					clickable : true,
-					// hoverable:false,
-            style : {
-                x : config.x,
-                y : config.y,
-                width : config.width,
-                height: config.height,
-								text:config.text,
-                brushType : 'stroke',
-                // color : 'white',
-								lineWidth : 1,
-                strokeColor : '#7848F1',
-                // lineJoin : 'round',
-                zlevel:3
-            },
-						highlightStyle:{
-							shadowBlur:1,
-							shadowColor:'#DAA520',
-							lineWidth : 0.7,
-	            strokeColor : '#FFD700'
-	          },
-            draggable : false
-        });
-      },
-      //鏍规嵁鏌愬勾鏌愭湀鏌愭棩绠楀嚭杩欏ぉ鏄槦鏈熷嚑銆傛瘡鍛ㄤ粠鍛ㄦ棩寮�濮嬶紝绱㈠紩index涓�0.
       getWeekDayByDate:function(year,month,day){
         var w=0,y=0,c=0,m=0,d=0;
         if(month<3){
@@ -387,7 +296,7 @@
         w=y+(y/4)+(c/4)-2*c+(26*(m+1)/10)+d-1;
         return w<0 ? (7+w) : Math.floor(w%7)%7;
       },
-      getSumDaysOfMonth:function(year,month){ //鑾峰彇鏌愬勾鏌愭湀鐨勫綋鏈堟�诲ぉ鏁般
+      getSumDaysOfMonth:function(year,month){
         var  tempDate = new Date(year,month,0);
         return tempDate.getDate();
       }

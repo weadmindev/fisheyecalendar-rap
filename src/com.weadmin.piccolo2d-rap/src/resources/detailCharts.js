@@ -5,7 +5,6 @@
   }
   DetailCurveCharts.prototype = {
     init:function(options){
-      this.zrender = options.zrender;
       this.echarts = options.echarts;
       this.container = options.container;
       this.dataObj = options.dataObj;
@@ -88,6 +87,7 @@
           if(dataObj){
             lineCharts && lineCharts.clear();
             lineCharts && lineCharts.setOption(_this.getChartData(leftTop.text,leftTop.flag));
+            (hasEnlargeBox && (this.enlargeBox.xIndex == i && this.enlargeBox.yIndex==j)) && this.setLineChartsOptionShow(i,j,true,1);
           }
           (function(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,animationTime,i,j){
             $(chartContainer).animate({

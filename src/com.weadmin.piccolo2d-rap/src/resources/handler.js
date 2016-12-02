@@ -88,18 +88,18 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		setDate:function(obj){
 			this._date = obj.date;
 			this._currentDay = obj.currentDay; //today date string.
-			console.log('setDate:',obj);
+			// console.log('setDate:',obj);
 		},
 		setLineColor:function(obj){
-			console.log('lineColor:',obj);
+			// console.log('lineColor:',obj);
 		},
 		setDataJson:function(obj){
 			this._dataObj = obj;
-			console.log('setDataJson:',obj);
+			// console.log('setDataJson:',obj);
 		},
 		setIsDefaulOpenToday:function(isOpen){
 			this._isDefaulOpenToday = isOpen;
-			console.log('_isDefaulOpenToday:',isOpen);
+			// console.log('_isDefaulOpenToday:',isOpen);
 		},
 		showList:function(){  //update calendar call
 			// this._dataObj = obj;
