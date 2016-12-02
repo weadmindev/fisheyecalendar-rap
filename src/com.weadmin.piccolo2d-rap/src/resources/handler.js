@@ -19,10 +19,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 	}
 
 	eclipsesource.piccolo2djs = function(properties) {
-		console.log("piccolo2djs....." , properties)
 		bindAll(this, [ "layout", "onReady", "onSend", "onRender"]);
 		this.parent = rap.getObject(properties.parent); //获取java端的一个图形容器。
-    console.log("this.parent:",this.parent);
 		this.element = document.createElement("div");
 		this.parent.append(this.element);
 		this.parent.addListener("Resize", this.layout);
@@ -123,7 +121,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		},
 		destroy : function() {
 			rap.off("send", this.onSend);
-			this.element.parentNode.removeChild(this.element);
+			(this.element && this.element.parentNode) ? this.element.parentNode.removeChild(this.element): null;
 		},
 
 		layout : function() {

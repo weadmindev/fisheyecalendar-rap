@@ -115,6 +115,7 @@
 			},
 			setCoordinateAndDayNum:function(){
 				this.leftTopPointArr = [];
+				this.todayIndex = {xIndex:-1,yIndex:-1};
 				var todayInFlag = '';
 				var todayNum = this.todayDate.getDate();
 				if(this.todayDate.getFullYear() == this.year){
@@ -151,6 +152,7 @@
 	        }
 				}
 				this.detailCurveCharts && this.detailCurveCharts.setEnlargeBox(this.enlargeBox);
+				this.detailCurveCharts && this.detailCurveCharts.setTodayIndex(this.todayIndex);
 				console.log("leftTopPointArr0000:",this.leftTopPointArr);
 			},
 			initCalendarHeader:function(){
@@ -262,6 +264,7 @@
 					this.updateParamsAboutDate();
 					this.setCoordinateAndDayNum();
 					this.refreshCalendarHeader();
+					this.detailCurveCharts.setFirstDayWeekIndex(this.firstDayWeekIndex);
 				}
 				// this.refreshTextShape();
 				this.detailCurveCharts.setPosition(this.leftTopPointArr,dataObj);

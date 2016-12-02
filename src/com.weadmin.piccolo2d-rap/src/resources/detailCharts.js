@@ -22,6 +22,7 @@
       this.chartContainerArr = []; //the div container
       this.lineChartsArr = [];
       this.canClickEnlarge = true;
+      this.isCtrlKeyDown = false;
       this.animationTime = options.animationTime || 1000; // millisecond.
       this.lineDescMap = {'package':'包成功率(%)','retime':'数据往返时间(ms)'};
       this.initElement();
@@ -84,11 +85,7 @@
           var nextPointX = ((j==colNum-1) ? this.width : rowList[j+1]['x']) -this.xStart; //next X point coordinate.
           var chartContainer = this.chartContainerArr[i][j];
           var lineCharts = this.lineChartsArr[i][j];
-          if(dataObj){
-            lineCharts && lineCharts.clear();
-            lineCharts && lineCharts.setOption(_this.getChartData(leftTop.text,leftTop.flag));
-            (hasEnlargeBox && (this.enlargeBox.xIndex == i && this.enlargeBox.yIndex==j)) && this.setLineChartsOptionShow(i,j,true,1);
-          }
+          this.resetLineChartsByDateOrData(dataObj,hasEnlargeBox,lineCharts,i,j);
           (function(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,animationTime,i,j){
             $(chartContainer).animate({
               left:curPointX+'px',
@@ -97,11 +94,11 @@
               height:(nextPointY - curPointY)+'px'
             },animationTime,'linear');
             setTimeout(function(){
-              lineCharts && lineCharts.resize({
+              lineCharts.resize({
                 width:(nextPointX - curPointX),
                 height:(nextPointY - curPointY)
               });
-            },20);
+            },10);
           })(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,_this.animationTime,i,j);
           (function(lineCharts,i,j){
             if(hasEnlargeBox && (_this.enlargeBox.xIndex != i || _this.enlargeBox.yIndex!=j)){
@@ -112,6 +109,21 @@
           })(lineCharts,i,j);
         }
       }
+      dataObj ? this.setTodayBoxBorderColor(): null;
+    },
+    resetLineChartsByDateOrData:function(dataObj,hasEnlargeBox,lineCharts,i,j){  //if update the date or data,we need clear the charts and reset it.
+      if(!dataObj){return};
+      var leftTop = this.leftTopPointArr[i][j];
+      var ele = this.chartContainerArr[i][j];
+      lineCharts && lineCharts.clear();
+      lineCharts && lineCharts.setOption(this.getChartData(leftTop.text,leftTop.flag));
+      (hasEnlargeBox && (this.enlargeBox.xIndex == i && this.enlargeBox.yIndex==j)) && this.setLineChartsOptionShow(i,j,true,1);
+      ele.setAttribute('data-flag',leftTop.flag);
+      ele.setAttribute('data-index',leftTop.text);
+      ele.setAttribute('data-xindex',i);
+      ele.setAttribute('data-yindex',j);
+      ele.style.boxShadow='0 0 0 0 #fff';
+      ele.style.zIndex=99;
     },
     updateOptions:function(options){
       for(var key in options){
@@ -166,6 +178,23 @@
             setTimeout(function(){
               _this.canClickEnlarge = true;
             },100);
+            if(!_this.isCtrlKeyDown){
+              var selected = params.selected;
+              for(var key in selected){
+                selected[key] = (key == params.name) ? true : false ;
+              }
+              _this.lineChartsArr[_this.enlargeBox.xIndex][_this.enlargeBox.yIndex].setOption({
+                legend:{
+                  selected:selected
+                }
+              });
+            }
+          });
+          $(document).keydown(function (event) {
+            _this.isCtrlKeyDown = event.ctrlKey;
+          });
+          $(document).keyup(function (event) {
+            _this.isCtrlKeyDown = event.ctrlKey;
           });
           //////////other event
         }
@@ -181,13 +210,19 @@
     setEnlargeBox:function(enlargeBox){
       this.enlargeBox = enlargeBox;
     },
+    setFirstDayWeekIndex:function(index){
+      this.firstDayWeekIndex = index;
+    },
+    setTodayIndex:function(todayIndex){
+      this.todayIndex = todayIndex;
+    },
     hasEnlargeBox:function(){
       return (this.enlargeBox.xIndex >= 0 && this.enlargeBox.yIndex >= 0) ? true : false;
     },
     setTodayBoxBorderColor:function(){
       if(this.todayIndex.xIndex>=0){
-        var i = parseInt(this.todayIndex.xIndex);
-        var j = parseInt(this.todayIndex.yIndex);
+        var i = this.todayIndex.xIndex;
+        var j = this.todayIndex.yIndex;
         // this.chartContainerArr[i][j].style.border = '1px solid #831FF1';
         this.chartContainerArr[i][j].style.boxShadow = '0 0 3px 2px #831FF1';
         this.chartContainerArr[i][j].style.zIndex = '99999';
@@ -278,7 +313,7 @@
           animationDurationUpdate:this.animationTime/2,
           animationEasingUpdate:'cubicInOut',
           animation:false,
-          color:['#6C9EBF','#65EC83','#CEE687','#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3','#E4706C'],
+          // color:['#6C9EBF','#65EC83','#CEE687','#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3','#E4706C'],
           title: {
               text: dayTxt+'',
               left:'1',
@@ -296,7 +331,7 @@
           // },
           legend: {
             show:false,
-              data:legendDescArr
+            data:legendDescArr
           },
           grid:{
             top:'10%',

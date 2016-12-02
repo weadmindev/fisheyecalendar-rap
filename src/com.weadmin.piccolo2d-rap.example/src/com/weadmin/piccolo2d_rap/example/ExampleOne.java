@@ -45,7 +45,7 @@ public class ExampleOne extends AbstractEntryPoint{
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ArrayList list = new ArrayList();
-				pjs.refresh(date,list);
+				pjs.refresh(new Date("2016/10/1"),dataModle(new Date("2016/10/1")));
 			}
 		});
 	}
