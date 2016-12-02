@@ -1,0 +1,8 @@
+.calendarHeader{
+	position:absolute;
+	top:15px;
+	transform:translateX(-50%);
+	font-size: 18px;
+	color: #0C83D8;
+  font-weight: 600;
+}
