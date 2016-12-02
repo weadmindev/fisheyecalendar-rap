@@ -29,7 +29,6 @@ public class Piccolo2dJS extends SVWidgetBase{
 		JsonObject jsonObject = JsonObject.readFrom(dealWithList(date,list));
 		super.setRemoteProp("dataJson", jsonObject);
 		super.callRemoteMethod("showList", jsonObject);
-		
 	}
 	
 	public void setLineColor(JSONObject json){
@@ -49,8 +48,8 @@ public class Piccolo2dJS extends SVWidgetBase{
 		super.callRemoteMethod("showList", JsonObject.readFrom(dealWithList(date,list)));
 	}
 	
-	public void setIsDefaulOpenToday(JSONObject json){
-		super.setRemoteProp("isDefaulOpenToday", JsonObject.readFrom(json.toJSONString()));
+	public void setIsDefaulOpenToday(boolean isOpen) {
+		super.setRemoteProp("isDefaulOpenToday", isOpen);
 	}
 	
 	@SuppressWarnings({ "deprecation", "rawtypes" })
