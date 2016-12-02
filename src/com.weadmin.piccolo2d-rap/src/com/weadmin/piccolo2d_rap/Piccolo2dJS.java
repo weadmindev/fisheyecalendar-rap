@@ -30,7 +30,7 @@ public class Piccolo2dJS extends SVWidgetBase{
 		super.setRemoteProp("dataJson", jsonObject);
 		super.callRemoteMethod("showList", jsonObject);
 	}
-	
+
 	public void setLineColor(JSONObject json){
 		super.setRemoteProp("lineColor", JsonObject.readFrom(json.toJSONString()));
 	}
@@ -47,11 +47,11 @@ public class Piccolo2dJS extends SVWidgetBase{
 		listSort(list);
 		super.callRemoteMethod("showList", JsonObject.readFrom(dealWithList(date,list)));
 	}
-	
+
 	public void setIsDefaulOpenToday(boolean isOpen) {
 		super.setRemoteProp("isDefaulOpenToday", isOpen);
 	}
-	
+
 	@SuppressWarnings({ "deprecation", "rawtypes" })
 	public static String dealWithList(Date date, List<JSONObject> list){
 		Calendar calendar = Calendar.getInstance();
@@ -207,7 +207,7 @@ public class Piccolo2dJS extends SVWidgetBase{
 		}
 		return date2;
 	}
-	
+
 	public static String formatDate(Date date){
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		return sdf.format(date);
@@ -236,6 +236,7 @@ public class Piccolo2dJS extends SVWidgetBase{
 	@Override
 	protected ArrayList<CustomRes> getCustomRes() {
 		ArrayList<CustomRes> res = new ArrayList<>();
+		res.add(new CustomRes("fishEyeCalendar.css", true, true));
 		res.add(new CustomRes("esl.js", true, false));
 		res.add(new CustomRes("zrender.js", true, false));
 		res.add(new CustomRes("jquery.js", true, false));
