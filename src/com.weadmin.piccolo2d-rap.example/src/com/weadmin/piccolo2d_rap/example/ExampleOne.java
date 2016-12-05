@@ -37,7 +37,6 @@ public class ExampleOne extends AbstractEntryPoint{
 		color.put("package", "#8DB6CD");
 //		color.put("retime", "#8B8682");
 		pjs.setLineColor(color);
-		pjs.setIsDefaulOpenToday(false);
 		// JSONObject isDefaulOpenToday = new JSONObject();
 		// isDefaulOpenToday.put("isDefaulOpenToday", false);
 		pjs.setIsDefaulOpenToday(false);
