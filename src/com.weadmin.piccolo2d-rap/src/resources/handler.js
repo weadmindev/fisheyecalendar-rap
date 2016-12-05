@@ -24,8 +24,12 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		this.element = document.createElement("div");
 		this.parent.append(this.element);
 		this.parent.addListener("Resize", this.layout);
+		this._date = new Date();
+		this._currentDay = new Date();
 		this._isDefaulOpenToday = false;
+
 		this._dataObj = {current:{},prev:{},next:{}};
+
 		this._size = properties.size ? properties.size : {
 			width : 300,
 			height : 300
@@ -60,11 +64,10 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
       var _this = this;
 			if (this.element.parentNode) {
 				rap.off("render", this.onRender);
-				var dt = new Date(this._date.replace(/\-/g,'/'));
 				// Creates the graph inside the given container
 				this.fishEyeCalendar = new FishEyeCalendar({
-					year:dt.getFullYear(),
-					month:dt.getMonth()+1,
+					year:this._date.getFullYear(),
+					month:this._date.getMonth()+1,
 					currentDay:this._currentDay,
 					isDefaulOpenToday:this._isDefaulOpenToday,
 					dataObj:this._dataObj,
@@ -85,8 +88,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			console.log("mxgraph...onSend..")
 		},
 		setDate:function(obj){
-			this._date = obj.date;
-			this._currentDay = obj.currentDay; //today date string.
+			this._date = new Date(obj.date.replace(/\-/g,'/'))
+			this._currentDay = new Date(obj.currentDay.replace(/\-/g,'/')); //today date string.
 			// console.log('setDate:',obj);
 		},
 		setLineColor:function(obj){
@@ -103,13 +106,12 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		},
 		showList:function(){  //update calendar call
 			// this._dataObj = obj;
-			var dt = new Date(this._date.replace(/\-/g,'/'));
-			this.fishEyeCalendar && this.fishEyeCalendar.updateCalendarByDateAndData(dt.getFullYear(),dt.getMonth()+1,this._dataObj,this._isDefaulOpenToday,this._lineColor);
+			this.fishEyeCalendar && this.fishEyeCalendar.updateCalendarByDateAndData(this._date.getFullYear(),this._date.getMonth()+1,this._dataObj,this._isDefaulOpenToday,this._lineColor);
 		},
 		setSize : function(size) {
 			var _this = this;
-			if(size.width == _this._size.width && size.height == _this._size.height){ return; }
 			if (this.ready) {
+				if(size.width == _this._size.width && size.height == _this._size.height){ return; }
 				async(this, function() { // Needed by IE for some reason
 					_this._size = size;
 					console.log('async:size',size);
@@ -131,6 +133,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			if (this.ready) {
 				var area = this.parent.getClientArea();
         console.log("this.parent.getClientArea():",area);
+				if(area[2] == this._size.width && area[3] == this._size.height){ return; }
 				this.element.style.left = area[0] + "px";
 				this.element.style.top = area[1] + "px";
 				this.element.style.width = area[2] + "px";

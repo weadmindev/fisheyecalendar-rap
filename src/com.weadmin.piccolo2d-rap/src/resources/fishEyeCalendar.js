@@ -30,7 +30,7 @@
 				this.animationTime = 600; // millisecond.
 				this.echarts = null;  //
 				this.detailCurveCharts = null;
-				this.todayDate = options.currentDay ? new Date(options.currentDay.replace(/\-/g,'/')) : new Date();
+				this.todayDate = options.currentDay;
 				this.todayIndex = {xIndex:-1,yIndex:-1};
 				// this.calendarHeaderDescArr = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 				this.calendarHeaderDescArr = ['日','一','二','三','四','五','六'];

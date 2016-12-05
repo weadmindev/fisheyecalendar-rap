@@ -317,7 +317,6 @@
           animationEasingUpdate:'cubicInOut',
           animation:false,
           color:this.lineColor,
-          // color:['#6C9EBF','#65EC83','#CEE687','#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3','#E4706C'],
           title: {
               text: dayTxt+'',
               left:'1',
