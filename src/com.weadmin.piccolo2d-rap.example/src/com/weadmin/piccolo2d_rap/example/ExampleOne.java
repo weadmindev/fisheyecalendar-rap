@@ -28,7 +28,7 @@ public class ExampleOne extends AbstractEntryPoint{
 //		parent.setLayout(null);
 		Button button = new Button(parent, SWT.PUSH);
 		button.setText("Refresh");
-		
+
 		Piccolo2dJS pjs = new Piccolo2dJS(parent, SWT.NONE);
 //		pjs.setBounds(20, 0, 1000, 600);
 		Date date = new Date("2016/11/28");
@@ -38,12 +38,15 @@ public class ExampleOne extends AbstractEntryPoint{
 //		color.put("retime", "#8B8682");
 		pjs.setLineColor(color);
 		pjs.setIsDefaulOpenToday(false);
+		// JSONObject isDefaulOpenToday = new JSONObject();
+		// isDefaulOpenToday.put("isDefaulOpenToday", false);
+		pjs.setIsDefaulOpenToday(false);
 		pjs.setLayoutData(new GridData(GridData.FILL_BOTH));
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ArrayList list = new ArrayList();
-				pjs.refresh(date,list);
+				pjs.refresh(new Date("2016/10/1"),dataModle(new Date("2016/10/1")));
 			}
 		});
 	}
