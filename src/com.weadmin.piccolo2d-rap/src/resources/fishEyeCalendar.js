@@ -268,13 +268,13 @@
 					this.month = +month;
 					this.enlargeBox.xIndex = -1;
 					this.enlargeBox.yIndex = -1;
-					this.setLineColor(lineColor ||{});
 					this.updateParamsAboutDate();
 					this.setCoordinateAndDayNum();
 					this.refreshCalendarHeader();
 					this.detailCurveCharts.setFirstDayWeekIndex(this.firstDayWeekIndex);
-					this.detailCurveCharts.setLineColor(this.lineColor);
 				}
+				this.setLineColor(lineColor ||{});
+				this.detailCurveCharts.setLineColor(this.lineColor);
 				// this.refreshTextShape();
 				this.detailCurveCharts.setPosition(this.leftTopPointArr,dataObj);
 			},
