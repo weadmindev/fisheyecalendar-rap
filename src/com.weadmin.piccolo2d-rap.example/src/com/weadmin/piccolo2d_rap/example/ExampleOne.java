@@ -37,9 +37,7 @@ public class ExampleOne extends AbstractEntryPoint{
 		color.put("package", "#8DB6CD");
 //		color.put("retime", "#8B8682");
 		pjs.setLineColor(color);
-		JSONObject isDefaulOpenToday = new JSONObject();
-		isDefaulOpenToday.put("isDefaulOpenToday", false);
-		pjs.setIsDefaulOpenToday(isDefaulOpenToday);
+		pjs.setIsDefaulOpenToday(false);
 		pjs.setLayoutData(new GridData(GridData.FILL_BOTH));
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
