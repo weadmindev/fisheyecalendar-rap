@@ -32,6 +32,8 @@
 				this.detailCurveCharts = null;
 				this.todayDate = options.currentDay ? new Date(options.currentDay) : new Date();
 				this.todayIndex = {xIndex:-1,yIndex:-1};
+				// this.calendarHeaderDescArr = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+				this.calendarHeaderDescArr = ['日','一','二','三','四','五','六'];
         this.initPathsConfig();
         this.initElement();
 	    },
@@ -153,9 +155,8 @@
 			},
 			initCalendarHeader:function(){
 				var firstRowPointArr = this.leftTopPointArr[0];
-				var calendarHeaderDescArr = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 				for(var i = 0; i < firstRowPointArr.length; i++){
-					var $el = $('<div class="calendarHeader">'+calendarHeaderDescArr[i]+'</div>');
+					var $el = $('<div class="calendarHeader">'+this.calendarHeaderDescArr[i]+'</div>');
 					var endPoint = (i==firstRowPointArr.length-1) ? this.width : firstRowPointArr[i+1]['x'];
 					var offsetX = (endPoint-firstRowPointArr[i]['x'])/2;
 					$el.css('left',(firstRowPointArr[i]['x'] + offsetX)+'px');
@@ -282,18 +283,8 @@
 				this.detailCurveCharts.setPosition(this.leftTopPointArr);
 			},
       getWeekDayByDate:function(year,month,day){
-        var w=0,y=0,c=0,m=0,d=0;
-        if(month<3){
-          m = month + 12;
-          year = year-1;
-        }else{
-          m = month;
-        }
-        y = (year%100);
-        c = parseInt(year/100);
-        d = day;
-        w=y+(y/4)+(c/4)-2*c+(26*(m+1)/10)+d-1;
-        return w<0 ? (7+w) : Math.floor(w%7)%7;
+        var date = new Date(year+'-'+month+'-'+day);
+        return date.getDay();
       },
       getSumDaysOfMonth:function(year,month){
         var  tempDate = new Date(year,month,0);
