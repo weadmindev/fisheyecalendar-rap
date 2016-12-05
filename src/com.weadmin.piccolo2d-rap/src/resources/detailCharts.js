@@ -223,7 +223,6 @@
       if(this.todayIndex.xIndex>=0){
         var i = this.todayIndex.xIndex;
         var j = this.todayIndex.yIndex;
-        // this.chartContainerArr[i][j].style.border = '1px solid #831FF1';
         this.chartContainerArr[i][j].style.boxShadow = '0 0 3px 2px #831FF1';
         this.chartContainerArr[i][j].style.zIndex = '99999';
       }
@@ -326,9 +325,6 @@
                 // fontSize: 18,
                 }
           },
-          // tooltip: {
-          //     trigger: 'axis'
-          // },
           legend: {
             show:false,
             data:legendDescArr

@@ -4,9 +4,7 @@
 	    this.init.apply(this, arguments);
 	};
 	FishEyeCalendar.prototype = {
-	    /**
-	     *options: {
-
+	    /***options: {
 	     	 }
 	     */
 	    init: function(options){
@@ -82,7 +80,6 @@
 											_this.refreshAllOnClick(clickXIndex,clickYIndex);
 										}
 									});
-								// _this.detailCurveCharts.setPosition(_this.leftTopPointArr,true);
             }
         )
 	    },
@@ -94,7 +91,6 @@
 				this.setCoordinateAndDayNum();
 				this.detailContainer.setAttribute('id','detailChartContainers');
 				this.detailContainer.style.position = 'absolute';
-				// this.detailContainer.style.border = 'solid 1px #7848F1';
 				this.detailContainer.style.width = (this.width-this.xStart)+'px';
 				this.detailContainer.style.height = (this.height-this.yStart)+'px';
 				this.detailContainer.style.left = this.xStart+'px';
