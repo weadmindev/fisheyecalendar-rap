@@ -60,7 +60,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
       var _this = this;
 			if (this.element.parentNode) {
 				rap.off("render", this.onRender);
-				var dt = new Date(this._date);
+				var dt = new Date(this._date.replace(/\-/g,'/'));
 				// Creates the graph inside the given container
 				this.fishEyeCalendar = new FishEyeCalendar({
 					year:dt.getFullYear(),
@@ -68,6 +68,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 					currentDay:this._currentDay,
 					isDefaulOpenToday:this._isDefaulOpenToday,
 					dataObj:this._dataObj,
+					lineColor:this._lineColor,
 					basePath:PICCOLO2D_BASEPATH,
 					container:_this.fishEyeContainer,
 					detailContainer:this.detailChartContainer
@@ -89,6 +90,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			// console.log('setDate:',obj);
 		},
 		setLineColor:function(obj){
+			this._lineColor = obj;
 			// console.log('lineColor:',obj);
 		},
 		setDataJson:function(obj){
@@ -101,8 +103,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		},
 		showList:function(){  //update calendar call
 			// this._dataObj = obj;
-			var dt = new Date(this._date);
-			this.fishEyeCalendar && this.fishEyeCalendar.updateCalendarByDateAndData(dt.getFullYear(),dt.getMonth()+1,this._dataObj,this._isDefaulOpenToday);
+			var dt = new Date(this._date.replace(/\-/g,'/'));
+			this.fishEyeCalendar && this.fishEyeCalendar.updateCalendarByDateAndData(dt.getFullYear(),dt.getMonth()+1,this._dataObj,this._isDefaulOpenToday,this._lineColor);
 		},
 		setSize : function(size) {
 			var _this = this;

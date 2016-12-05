@@ -25,6 +25,7 @@
       this.isCtrlKeyDown = false;
       this.animationTime = options.animationTime || 1000; // millisecond.
       this.lineDescMap = {'package':'包成功率(%)','retime':'数据往返时间(ms)'};
+      this.lineColor = options.lineColor;
       this.initElement();
       this.addEvent();
     },
@@ -219,6 +220,9 @@
     hasEnlargeBox:function(){
       return (this.enlargeBox.xIndex >= 0 && this.enlargeBox.yIndex >= 0) ? true : false;
     },
+    setLineColor:function(lineColor){
+      this.lineColor = lineColor;
+    },
     setTodayBoxBorderColor:function(){
       if(this.todayIndex.xIndex>=0){
         var i = this.todayIndex.xIndex;
@@ -312,6 +316,7 @@
           animationDurationUpdate:this.animationTime/2,
           animationEasingUpdate:'cubicInOut',
           animation:false,
+          color:this.lineColor,
           // color:['#6C9EBF','#65EC83','#CEE687','#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3','#E4706C'],
           title: {
               text: dayTxt+'',

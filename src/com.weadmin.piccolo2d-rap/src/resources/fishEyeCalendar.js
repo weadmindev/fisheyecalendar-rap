@@ -30,11 +30,13 @@
 				this.animationTime = 600; // millisecond.
 				this.echarts = null;  //
 				this.detailCurveCharts = null;
-				this.todayDate = options.currentDay ? new Date(options.currentDay) : new Date();
+				this.todayDate = options.currentDay ? new Date(options.currentDay.replace(/\-/g,'/')) : new Date();
 				this.todayIndex = {xIndex:-1,yIndex:-1};
 				// this.calendarHeaderDescArr = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 				this.calendarHeaderDescArr = ['日','一','二','三','四','五','六'];
-        this.initPathsConfig();
+				this.lineColor = ['#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3'];
+				this.setLineColor(options.lineColor || {});
+				this.initPathsConfig();
         this.initElement();
 	    },
       initPathsConfig:function(){
@@ -78,6 +80,7 @@
 										firstDayWeekIndex:_this.firstDayWeekIndex,
 										todayIndex:_this.todayIndex,
 										leftTopPointArr:_this.leftTopPointArr,
+										lineColor:_this.lineColor,
 										refreshAllOnClick:function(clickXIndex,clickYIndex){
 											_this.refreshAllOnClick(clickXIndex,clickYIndex);
 										}
@@ -110,6 +113,13 @@
 				this.prevMonthDays = this.getSumDaysOfMonth(this.year,this.month-1); //the total number of days of one month.
 				this.monthDays = this.getSumDaysOfMonth(this.year,this.month); //the total number of days of one month.
         this.firstDayWeekIndex = this.getWeekDayByDate(this.year,this.month,1); //the first day of one month is day of the week.
+			},
+			setLineColor:function(lineColorOpt){
+				var i=0;
+				for(var key in lineColorOpt){
+					this.lineColor[i] = lineColorOpt[key];
+					i++;
+				}
 			},
 			setCoordinateAndDayNum:function(){
 				this.leftTopPointArr = [];
@@ -250,7 +260,7 @@
 					},this.animationTime,'linear');
 				}
 			},
-			updateCalendarByDateAndData:function(year,month,dataObj,isDefaulOpenToday){  //change the calendar shape by change the year/month and data.
+			updateCalendarByDateAndData:function(year,month,dataObj,isDefaulOpenToday,lineColor){  //change the calendar shape by change the year/month and data.
 				this.dataObj = dataObj;
 				this.isDefaulOpenToday = isDefaulOpenToday;
 				if(this.year != year || this.month != month){ //if don't change year and month,then just refresh curve charts.
@@ -258,10 +268,12 @@
 					this.month = +month;
 					this.enlargeBox.xIndex = -1;
 					this.enlargeBox.yIndex = -1;
+					this.setLineColor(lineColor ||{});
 					this.updateParamsAboutDate();
 					this.setCoordinateAndDayNum();
 					this.refreshCalendarHeader();
 					this.detailCurveCharts.setFirstDayWeekIndex(this.firstDayWeekIndex);
+					this.detailCurveCharts.setLineColor(this.lineColor);
 				}
 				// this.refreshTextShape();
 				this.detailCurveCharts.setPosition(this.leftTopPointArr,dataObj);
@@ -283,7 +295,7 @@
 				this.detailCurveCharts.setPosition(this.leftTopPointArr);
 			},
       getWeekDayByDate:function(year,month,day){
-        var date = new Date(year+'-'+month+'-'+day);
+        var date = new Date(year,month,day);
         return date.getDay();
       },
       getSumDaysOfMonth:function(year,month){
