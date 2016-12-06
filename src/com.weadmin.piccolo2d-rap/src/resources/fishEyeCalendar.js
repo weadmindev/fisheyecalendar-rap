@@ -161,7 +161,7 @@
 				}
 				this.detailCurveCharts && this.detailCurveCharts.setEnlargeBox(this.enlargeBox);
 				this.detailCurveCharts && this.detailCurveCharts.setTodayIndex(this.todayIndex);
-				console.log("leftTopPointArr0000:",this.leftTopPointArr);
+				// console.log("leftTopPointArr0000:",this.leftTopPointArr);
 			},
 			initCalendarHeader:function(){
 				var firstRowPointArr = this.leftTopPointArr[0];
@@ -295,7 +295,7 @@
 				this.detailCurveCharts.setPosition(this.leftTopPointArr);
 			},
       getWeekDayByDate:function(year,month,day){
-        var date = new Date(year,month,day);
+        var date = new Date(year+'/'+month+'/'+day);
         return date.getDay();
       },
       getSumDaysOfMonth:function(year,month){

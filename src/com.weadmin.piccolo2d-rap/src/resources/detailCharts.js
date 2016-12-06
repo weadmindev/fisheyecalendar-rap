@@ -17,6 +17,7 @@
       this.refreshAllOnClick = options.refreshAllOnClick;
       this.leftTopPointArr = options.leftTopPointArr || [];
       this.enlargeBox = options.enlargeBox || {xIndex:-1,yIndex:-1};
+      this.oldEnlargeBox = {xIndex:this.enlargeBox.xIndex,yIndex:this.enlargeBox.yIndex};
       this.todayIndex = options.todayIndex; //from 0 start. min value is 0.
       this.firstDayWeekIndex = options.firstDayWeekIndex;
       this.chartContainerArr = []; //the div container
@@ -94,12 +95,16 @@
               width:(nextPointX - curPointX)+'px',
               height:(nextPointY - curPointY)+'px'
             },animationTime,'linear');
+            var delayAnimation = 10;
+            if(_this.oldEnlargeBox.xIndex>=0 && _this.oldEnlargeBox.xIndex==i){
+              delayAnimation = animationTime;
+            }
             setTimeout(function(){
               lineCharts.resize({
                 width:(nextPointX - curPointX),
                 height:(nextPointY - curPointY)
               });
-            },10);
+            },delayAnimation);
           })(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,_this.animationTime,i,j);
           (function(lineCharts,i,j){
             if(hasEnlargeBox && (_this.enlargeBox.xIndex != i || _this.enlargeBox.yIndex!=j)){
@@ -110,6 +115,7 @@
           })(lineCharts,i,j);
         }
       }
+      this.setOldEnlargeBox();
       dataObj ? this.setTodayBoxBorderColor(): null;
     },
     resetLineChartsByDateOrData:function(dataObj,hasEnlargeBox,lineCharts,i,j){  //if update the date or data,we need clear the charts and reset it.
@@ -210,6 +216,9 @@
     },
     setEnlargeBox:function(enlargeBox){
       this.enlargeBox = enlargeBox;
+    },
+    setOldEnlargeBox:function(){
+      this.oldEnlargeBox = {xIndex:this.enlargeBox.xIndex,yIndex:this.enlargeBox.yIndex};
     },
     setFirstDayWeekIndex:function(index){
       this.firstDayWeekIndex = index;
@@ -338,20 +347,20 @@
             width:'80%',
             height:'80%'
           },
-          dataZoom: [
-              {
-                  id: 'dataZoomX',
-                  type: 'inside',
-                  xAxisIndex: [0],
-                  filterMode: 'filter'
-              },
-              {
-                  id: 'dataZoomY',
-                  type: 'inside',
-                  yAxisIndex: [0],
-                  filterMode: 'filter'
-              }
-          ],
+          // dataZoom: [
+          //     {
+          //         id: 'dataZoomX',
+          //         type: 'inside',
+          //         xAxisIndex: [0],
+          //         filterMode: 'filter'
+          //     },
+          //     {
+          //         id: 'dataZoomY',
+          //         type: 'inside',
+          //         yAxisIndex: [0],
+          //         filterMode: 'filter'
+          //     }
+          // ],
           xAxis: [
               {
                   type: 'value',

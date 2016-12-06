@@ -31,7 +31,7 @@ public class ExampleOne extends AbstractEntryPoint{
 
 		Piccolo2dJS pjs = new Piccolo2dJS(parent, SWT.NONE);
 //		pjs.setBounds(20, 0, 1000, 600);
-		Date date = new Date("2016/11/28");
+		Date date = new Date("2016/12/6");
 		pjs.refresh(date,dataModle(date));
 		JSONObject color = new JSONObject();
 		color.put("package", "#8DB6CD");
