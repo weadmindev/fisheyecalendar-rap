@@ -42,36 +42,31 @@
           var ele = document.createElement('div');
           var leftTop = this.leftTopPointArr[i][j];
           var nextPointX = ((j==this.xBoxNum-1) ? this.width : rowList[j+1]['x']) -this.xStart; //next X point coordinate.
-          ele.style.padding = '2px';
-          ele.style.position = 'absolute';
-          ele.style.backgroundColor = '#D8DBE4';
-          ele.style.boxSizing = 'border-box';
-          ele.style.border = '1px solid #888A8E';
           ele.style.left = leftTop.x-this.xStart+'px';
           ele.style.top = leftTop.y-this.yStart+'px';
           ele.style.width = (nextPointX - leftTop.x + this.xStart)+'px';
           ele.style.height = (nextPointY - leftTop.y + this.yStart)+'px';
+          ele.style.backgroundColor= leftTop.flag=='current' ? '#fff' : '#D8DBE4';
           this.chartContainerArr[i][j] = ele;
           this.container.appendChild(ele);
+          ele.setAttribute('class','chartContainer');
           ele.setAttribute('data-flag',leftTop.flag);
           ele.setAttribute('data-index',leftTop.text);
           ele.setAttribute('data-xindex',i);
           ele.setAttribute('data-yindex',j);
-          this.lineChartsArr[i][j] = this.echarts.init(ele, null, {renderer: 'canvas'});
-
+          $(ele).append('<span class="chartDayText">'+leftTop.text+'</span>');
+          $(ele).append('<div class="chartContent"></div>');
+          this.lineChartsArr[i][j] = this.echarts.init($(ele).find('.chartContent')[0], null, {renderer: 'canvas'});
           this.lineChartsArr[i][j].setOption(this.getChartData(leftTop.text,leftTop.flag));
-          if(hasEnlargeBox && (this.enlargeBox.xIndex != i || this.enlargeBox.yIndex!=j)){
-            this.setLineChartsSeriesShow(this.lineChartsArr[i][j],false,i,j);
-          }else{
-            this.setLineChartsSeriesShow(this.lineChartsArr[i][j],true,i,j);
-            hasEnlargeBox && this.setLineChartsOptionShow(i,j,true,1);
-          }
         }
       }
       this.setTodayBoxBorderColor();
     },
     setPosition:function(leftTopPointArr,dataObj){
-      dataObj ? (this.dataObj = dataObj) : null;
+      if(dataObj){
+        this.dataObj = dataObj;
+        this.setOldEnlargeBox();
+      }
       var _this = this;
       this.leftTopPointArr = leftTopPointArr;
       var hasEnlargeBox = this.hasEnlargeBox();
@@ -95,16 +90,17 @@
               width:(nextPointX - curPointX)+'px',
               height:(nextPointY - curPointY)+'px'
             },animationTime,'linear');
-            var delayAnimation = 10;
-            if(_this.oldEnlargeBox.xIndex>=0 && _this.oldEnlargeBox.xIndex==i){
-              delayAnimation = animationTime;
-            }
-            setTimeout(function(){
-              lineCharts.resize({
-                width:(nextPointX - curPointX),
-                height:(nextPointY - curPointY)
-              });
-            },delayAnimation);
+            _this.refreshZoomAnimation(i,j,(nextPointX - curPointX),(nextPointY - curPointY));
+            // var delayAnimation = animationTime;
+            // if(_this.oldEnlargeBox.xIndex>=0 && _this.oldEnlargeBox.xIndex==i){
+            //   delayAnimation = animationTime;
+            // }
+            // setTimeout(function(){
+            //   lineCharts.resize({
+            //     width:(nextPointX - curPointX),
+            //     height:(nextPointY - curPointY)
+            //   });
+            // },delayAnimation);
           })(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,_this.animationTime,i,j);
           (function(lineCharts,i,j){
             if(hasEnlargeBox && (_this.enlargeBox.xIndex != i || _this.enlargeBox.yIndex!=j)){
@@ -115,7 +111,6 @@
           })(lineCharts,i,j);
         }
       }
-      this.setOldEnlargeBox();
       dataObj ? this.setTodayBoxBorderColor(): null;
     },
     resetLineChartsByDateOrData:function(dataObj,hasEnlargeBox,lineCharts,i,j){  //if update the date or data,we need clear the charts and reset it.
@@ -125,12 +120,82 @@
       lineCharts && lineCharts.clear();
       lineCharts && lineCharts.setOption(this.getChartData(leftTop.text,leftTop.flag));
       (hasEnlargeBox && (this.enlargeBox.xIndex == i && this.enlargeBox.yIndex==j)) && this.setLineChartsOptionShow(i,j,true,1);
+      ele.style.backgroundColor= leftTop.flag=='current' ? '#fff' : '#D8DBE4';
       ele.setAttribute('data-flag',leftTop.flag);
       ele.setAttribute('data-index',leftTop.text);
       ele.setAttribute('data-xindex',i);
       ele.setAttribute('data-yindex',j);
       ele.style.boxShadow='0 0 0 0 #fff';
       ele.style.zIndex=99;
+      $(ele).find('.chartDayText').text(leftTop.text);
+    },
+    refreshZoomAnimation:function(i,j,width,height){
+      var chartContainer = this.chartContainerArr[i][j];
+      var lineCharts = this.lineChartsArr[i][j];
+      var oldx = this.oldEnlargeBox.xIndex, oldy = this.oldEnlargeBox.yIndex;
+      var x = this.enlargeBox.xIndex, y = this.enlargeBox.yIndex;
+      var className = '';
+      var originWidth = lineCharts.getWidth();
+      var originHeight = lineCharts.getHeight();
+      if(oldx ==-1 && x!=-1){ //old has not enlarge box
+        if(x == i && j == j){
+          lineCharts.resize({width:width,height:height});
+          $(chartContainer).find('.chartContent').addClass('origin2max');
+          setTimeout(function(){
+            $(chartContainer).find('.chartContent').removeClass('origin2max');
+          },this.animationTime);
+        }else if(x != i && j != j){
+          lineCharts.resize({width:width,height:height});
+          $(chartContainer).find('.chartContent').addClass('origin2min');
+          setTimeout(function(){
+            $(chartContainer).find('.chartContent').removeClass('origin2min');
+          },this.animationTime);
+        }else{
+          lineCharts.resize({width:width,height:height});
+        }
+      }else if(oldx !=-1 && x!=-1){ //old has enlarge box,now has enlarge box
+        if(oldx == i && oldy == j){//to zoomout
+          if(oldx != x && oldy != y){
+            className = 'max2min';
+          }else if(oldx != x && oldy == y){
+            className = 'max2miny';
+          }else if(oldx == x && oldy != y){
+            className = 'max2minx';
+          }
+          $(chartContainer).find('.chartContent').addClass(className);
+          setTimeout(function(){
+            lineCharts.resize({width:width,height:height});
+            $(chartContainer).find('.chartContent').removeClass(className);
+          },this.animationTime);
+        }else if(x==i&&y==j){ //to zoomin
+          if(oldx != x && oldy != y){
+            className = 'min2max';
+          }else if(oldx != x && oldy == y){
+            className = 'min2maxy';
+          }else if(oldx == x && oldy != y){
+            className = 'min2maxx';
+          }
+          lineCharts.resize({width:width,height:height});
+          $(chartContainer).find('.chartContent').addClass(className);
+          setTimeout(function(){
+            $(chartContainer).find('.chartContent').removeClass(className);
+          },this.animationTime);
+        }else{
+          lineCharts.resize({width:width,height:height});
+        }
+      }else if(oldx !=-1 && x==-1){ // reset all to primary size.
+        if(oldx == i && oldy == j){
+          $(chartContainer).find('.chartContent').addClass('max2origin');
+          setTimeout(function(){
+            lineCharts.resize({width:width,height:height});
+            $(chartContainer).find('.chartContent').removeClass('max2origin');
+          },this.animationTime);
+        }else{
+          lineCharts.resize({width:width,height:height});
+        }
+      }else if(oldx ==-1 && x==-1){ // reset all to primary size.
+        lineCharts.resize({width:width,height:height});
+      }
     },
     updateOptions:function(options){
       for(var key in options){
@@ -172,6 +237,7 @@
             if(oldDayIndex != index){
               _this.setLineChartsOptionShow(clickXIndex,clickYIndex,true);
             }
+            _this.setOldEnlargeBox();
             _this.refreshAllOnClick(clickXIndex,clickYIndex);
           };
           this.lineChartsArr[i][j] && this.lineChartsArr[i][j].on('click', function(params){
@@ -310,8 +376,8 @@
           type:'line',
           hoverAnimation:false,
           symbolSize :1,
-          showSymbol :false,
-          lineStyle:{normal:{width:1}},
+          showSymbol :true,
+          lineStyle:{normal:{opacity:1,width:1}},
           data:linesArr[i]['data']
         });
       }
@@ -321,23 +387,10 @@
       var legendDescArr = this.getlegendListByDay(dayTxt,flag);
       var seriesList = this.getLineSeriesData(dayTxt,flag,legendDescArr);
         var chartData = {
-          backgroundColor: flag=='current' ? '#fff' : '#D8DBE4',
           animationDurationUpdate:this.animationTime/2,
           animationEasingUpdate:'cubicInOut',
           animation:false,
           color:this.lineColor,
-          title: {
-              text: dayTxt+'',
-              left:'1',
-              top:'0',
-              textStyle: {
-                color: '#2d78f4',
-                // fontStyle: 'normal',
-                fontWeight: 'bolder',
-                fontFamily:'STCaiyun'
-                // fontSize: 18,
-                }
-          },
           legend: {
             show:false,
             data:legendDescArr
@@ -347,26 +400,14 @@
             width:'80%',
             height:'80%'
           },
-          // dataZoom: [
-          //     {
-          //         id: 'dataZoomX',
-          //         type: 'inside',
-          //         xAxisIndex: [0],
-          //         filterMode: 'filter'
-          //     },
-          //     {
-          //         id: 'dataZoomY',
-          //         type: 'inside',
-          //         yAxisIndex: [0],
-          //         filterMode: 'filter'
-          //     }
-          // ],
           xAxis: [
               {
                   type: 'value',
                   boundaryGap: true,
                   min:0,
                   max:1440,
+                  axisTick :{show:true},
+                  axisLine:{show:true},
                   axisLabel:{
                     show:false,
                     formatter:function (value, index) {
@@ -386,6 +427,8 @@
           yAxis: [
               {
                   type: 'value',
+                  axisTick :{show:true},
+                  axisLine:{show:true},
                   axisLabel:{
                     show:false
                   }

@@ -261,6 +261,7 @@
 				}
 			},
 			updateCalendarByDateAndData:function(year,month,dataObj,isDefaulOpenToday,lineColor){  //change the calendar shape by change the year/month and data.
+				var _this = this;
 				this.dataObj = dataObj;
 				this.isDefaulOpenToday = isDefaulOpenToday;
 				if(this.year != year || this.month != month){ //if don't change year and month,then just refresh curve charts.
@@ -271,9 +272,18 @@
 					this.updateParamsAboutDate();
 					this.setCoordinateAndDayNum();
 					this.refreshCalendarHeader();
-					this.detailCurveCharts.setFirstDayWeekIndex(this.firstDayWeekIndex);
 				}
 				this.setLineColor(lineColor ||{});
+				var interval = setInterval(function(){
+					if(_this.detailCurveCharts){
+						clearInterval(interval);
+						console.log('setInterval:------');
+						 _this.refreshCurveCharts(dataObj);
+					}
+				},50);
+			},
+			refreshCurveCharts:function(dataObj){
+				this.detailCurveCharts.setFirstDayWeekIndex(this.firstDayWeekIndex);
 				this.detailCurveCharts.setLineColor(this.lineColor);
 				// this.refreshTextShape();
 				this.detailCurveCharts.setPosition(this.leftTopPointArr,dataObj);

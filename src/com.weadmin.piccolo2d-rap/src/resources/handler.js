@@ -27,7 +27,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		this._date = new Date();
 		this._currentDay = new Date();
 		this._isDefaulOpenToday = false;
-
+		this._lineColor = {};
 		this._dataObj = {current:{},prev:{},next:{}};
 
 		this._size = properties.size ? properties.size : {
@@ -47,7 +47,18 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		this.detailChartContainer.style.width = "100%";
 		this.detailChartContainer.style.height = "100%";
 		this.element.appendChild(this.detailChartContainer);
-
+		// Creates the graph inside the given container
+		this.fishEyeCalendar = new FishEyeCalendar({
+			year:this._date.getFullYear(),
+			month:this._date.getMonth()+1,
+			currentDay:this._currentDay,
+			isDefaulOpenToday:this._isDefaulOpenToday,
+			dataObj:this._dataObj,
+			lineColor:this._lineColor,
+			basePath:PICCOLO2D_BASEPATH,
+			container:this.fishEyeContainer,
+			detailContainer:this.detailChartContainer
+		});
 		rap.on("render", this.onRender);
 	};
 	eclipsesource.piccolo2djs.prototype = {
@@ -64,18 +75,6 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
       var _this = this;
 			if (this.element.parentNode) {
 				rap.off("render", this.onRender);
-				// Creates the graph inside the given container
-				this.fishEyeCalendar = new FishEyeCalendar({
-					year:this._date.getFullYear(),
-					month:this._date.getMonth()+1,
-					currentDay:this._currentDay,
-					isDefaulOpenToday:this._isDefaulOpenToday,
-					dataObj:this._dataObj,
-					lineColor:this._lineColor,
-					basePath:PICCOLO2D_BASEPATH,
-					container:_this.fishEyeContainer,
-					detailContainer:this.detailChartContainer
-				});
         /////////////////////
 				rap.on("send", this.onSend);
 				this.ready = true;
@@ -106,6 +105,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		},
 		showList:function(){  //update calendar call
 			// this._dataObj = obj;
+			console.log('showList:-----',this._dataObj);
 			this.fishEyeCalendar && this.fishEyeCalendar.updateCalendarByDateAndData(this._date.getFullYear(),this._date.getMonth()+1,this._dataObj,this._isDefaulOpenToday,this._lineColor);
 		},
 		setSize : function(size) {
