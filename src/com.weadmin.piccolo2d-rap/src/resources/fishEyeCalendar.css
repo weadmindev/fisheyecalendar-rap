@@ -43,41 +43,41 @@ animation: max2origin 0.6s linear;
 }
 /*origin2min*/
 @keyframes origin2min{
-    0% {transform: scale(0.3968,0.3968);}
+    0% {transform: scale(0.3968,0.3568);}
     100% {transform: scale(1,1);}
 }
 /* Safari and Chrome */
 @-webkit-keyframes origin2min {
-	0% {transform: scale(0.3968,0.3968);}
+	0% {transform: scale(0.3968,0.3568);}
 	100% {transform: scale(1,1);}
 }
 .origin2min{
-animation: origin2min 0.6s linear;
+animation: origin2min 0.4s linear;
 }
 
 @keyframes origin2max{
-    0% {transform: scale(0.216,0.216);}
-    100% {transform: scale(1,1);}
+    0% {transform: scale(0.216,0.216) translate(-80%,-80%);}
+    100% {transform: scale(1,1) translate(0,0);}
 }
 
 /* Safari and Chrome */
 @-webkit-keyframes origin2max {
-	0% {transform: scale(0.216,0.216);}
-	100% {transform: scale(1,1);}
+	0% {transform: scale(0.216,0.216) translate(-80%,-80%);}
+	100% {transform: scale(1,1) translate(0,0);}
 }
 .origin2max{
 animation: origin2max 0.6s linear;
 }
 /*from min to max*/
 @keyframes min2max{
-    0% {transform: scale(0.0859,0.0859);}
-    100% {transform: scale(1,1);}
+    0% {transform: scale(0.0859,0.0859) translate(-80%,-80%);}
+    100% {transform: scale(1,1) translate(0,0);}
 }
 
 /* Safari and Chrome */
 @-webkit-keyframes min2max {
-	0% {transform: scale(0.0859,0.0859);}
-	100% {transform: scale(1,1);}
+	0% {transform: scale(0.0859,0.0859) translate(-80%,-80%);}
+	100% {transform: scale(1,1) translate(0,0);}
 }
 .min2max{
 animation: min2max 0.6s linear;
@@ -95,18 +95,31 @@ animation: min2max 0.6s linear;
 .min2maxy{
 animation: min2maxy 0.6s linear;
 }
-/*from min to max x*/
-@keyframes min2maxx{
+/*from min to max x ,on old left*/
+@keyframes min2maxxL{
+    0% {transform: scale(0.0859,1) translateX(-80%);}
+    100% {transform: scale(1,1) translateX(0);}
+}
+/* Safari and Chrome */
+@-webkit-keyframes min2maxxL {
+	0% {transform: scale(0.0859,1) translateX(-80%);}
+	100% {transform: scale(1,1) translateX(0);}
+}
+.min2maxxL{
+animation: min2maxxL 0.6s linear;
+}
+/*from min to max x ,on old right*/
+@keyframes min2maxxR{
     0% {transform: scale(0.0859,1);}
     100% {transform: scale(1,1);}
 }
 /* Safari and Chrome */
-@-webkit-keyframes min2maxx {
+@-webkit-keyframes min2maxxR {
 	0% {transform: scale(0.0859,1);}
 	100% {transform: scale(1,1);}
 }
-.min2maxx{
-animation: min2maxx 0.6s linear;
+.min2maxxR{
+animation: min2maxxR 0.6s linear;
 }
 
 /*from max to min*/
@@ -114,7 +127,6 @@ animation: min2maxx 0.6s linear;
     0% {transform: scale(1,1);}
     100% {transform: scale(0.0859,0.0859) translate(-130%,-130%);}
 }
-
 /* Safari and Chrome */
 @-webkit-keyframes max2min {
 	0% {transform: scale(1,1);}
@@ -139,15 +151,41 @@ animation: max2miny 0.6s linear;
 }
 
 /*from max to min x*/
-@keyframes max2minx{
+@keyframes max2minxxR{
+    0% {transform: scale(1,1);}
+    100% {transform: scale(0.0859,1) translateX(-60%);}
+}
+/* Safari and Chrome */
+@-webkit-keyframes max2minxxR {
+	0% {transform: scale(1,1);}
+	100% {transform: scale(0.0859,1) translateX(-60%);}
+}
+.max2minxxR{
+animation: max2minxxR 0.4s linear;
+}
+/*from max to min x*/
+@keyframes max2minxxL{
     0% {transform: scale(1,1);}
     100% {transform: scale(0.0859,1) translateX(-100%);}
 }
 /* Safari and Chrome */
-@-webkit-keyframes max2minx {
+@-webkit-keyframes max2minxxL {
 	0% {transform: scale(1,1);}
 	100% {transform: scale(0.0859,1) translateX(-100%);}
 }
-.max2minx{
-animation: max2minx 0.6s linear;
+.max2minxxL{
+animation: max2minxxL 0.4s linear;
+}
+/*from min to origin, primary size*/
+@keyframes min2origin{
+    0% {transform: scale(0.0859,0.0859) translate(-80%,-80%);}
+    100% {transform: scale(1,1) translate(0,0);}
+}
+/* Safari and Chrome */
+@-webkit-keyframes min2origin {
+	0% {transform: scale(0.0859,0.0859) translate(-80%,-80%);}
+	100% {transform: scale(1,1) translate(0,0);}
+}
+.min2origin{
+animation: min2origin 0.6s linear;
 }

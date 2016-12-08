@@ -19,7 +19,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 	}
 
 	eclipsesource.piccolo2djs = function(properties) {
-		bindAll(this, [ "layout", "onReady", "onSend", "onRender"]);
+		bindAll(this, [ "layout", "onReady", "onSend", "onRender","refreshSize"]);
 		this.parent = rap.getObject(properties.parent); //获取java端的一个图形容器。
 		this.element = document.createElement("div");
 		this.parent.append(this.element);
@@ -75,6 +75,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
       var _this = this;
 			if (this.element.parentNode) {
 				rap.off("render", this.onRender);
+				console.log("piccolo2djs...onRender..");
         /////////////////////
 				rap.on("send", this.onSend);
 				this.ready = true;
@@ -104,20 +105,29 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			// console.log('_isDefaulOpenToday:',isOpen);
 		},
 		showList:function(){  //update calendar call
+			var _this = this;
 			// this._dataObj = obj;
-			console.log('showList:-----',this._dataObj);
-			this.fishEyeCalendar && this.fishEyeCalendar.updateCalendarByDateAndData(this._date.getFullYear(),this._date.getMonth()+1,this._dataObj,this._isDefaulOpenToday,this._lineColor);
+			// console.log('showList:-----',this._dataObj);
+
+			this.fishEyeCalendar.updateCalendarByDateAndData(this._date.getFullYear(),this._date.getMonth()+1,this._dataObj,this._isDefaulOpenToday,this._lineColor);
+			var area = this.parent.getClientArea();
+			if(area[2] == this._size.width && area[3] == this._size.height){ return; }
+			// console.log('showList:size',area);
+			this._size = {width:area[2],height:area[3]};
+			setTimeout(function(){
+				_this.refreshSize(area[0],area[1],area[2],area[3]);
+			},100);
 		},
 		setSize : function(size) {
 			var _this = this;
 			if (this.ready) {
+				console.log('async:size',size);
 				if(size.width == _this._size.width && size.height == _this._size.height){ return; }
 				async(this, function() { // Needed by IE for some reason
-					_this._size = size;
-					console.log('async:size',size);
-					_this.element.style.width = size.width+"px";
-					_this.element.style.height = (size.height-20)+"px";
-					_this.fishEyeCalendar.refreshBySize(_this._size);
+					_this.refreshSize(0,0,size.width,size.height);
+					// _this.element.style.width = size.width+"px";
+					// _this.element.style.height = (size.height-20)+"px";
+					// _this.fishEyeCalendar.refreshBySize(_this._size);
 				});
 			} else {
 				this._size = size;
@@ -134,13 +144,16 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				var area = this.parent.getClientArea();
         console.log("this.parent.getClientArea():",area);
 				if(area[2] == this._size.width && area[3] == this._size.height){ return; }
-				this.element.style.left = area[0] + "px";
-				this.element.style.top = area[1] + "px";
-				this.element.style.width = area[2] + "px";
-				this.element.style.height = area[3] + "px";
-				this._size = {width:area[2],height:area[3]};
-				this.fishEyeCalendar.refreshBySize(this._size);
+				this.refreshSize(area[0],area[1],area[2],area[3]);
 			}
+		},
+		refreshSize:function(left,top,width,height){
+			this._size = {width:width,height:height};
+			this.element.style.left = left + "px";
+			this.element.style.top = top + "px";
+			this.element.style.width = width + "px";
+			this.element.style.height = height + "px";
+			this.fishEyeCalendar.refreshBySize(this._size);
 		}
 
 	};

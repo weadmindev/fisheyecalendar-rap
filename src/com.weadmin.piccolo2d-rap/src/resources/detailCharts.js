@@ -84,23 +84,15 @@
           var lineCharts = this.lineChartsArr[i][j];
           this.resetLineChartsByDateOrData(dataObj,hasEnlargeBox,lineCharts,i,j);
           (function(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,animationTime,i,j){
-            $(chartContainer).animate({
-              left:curPointX+'px',
-              top:curPointY+'px',
-              width:(nextPointX - curPointX)+'px',
-              height:(nextPointY - curPointY)+'px'
-            },animationTime,'linear');
+            setTimeout(function(){
+              $(chartContainer).animate({
+                left:curPointX+'px',
+                top:curPointY+'px',
+                width:(nextPointX - curPointX)+'px',
+                height:(nextPointY - curPointY)+'px'
+              },animationTime,'linear');
+            },10);
             _this.refreshZoomAnimation(i,j,(nextPointX - curPointX),(nextPointY - curPointY));
-            // var delayAnimation = animationTime;
-            // if(_this.oldEnlargeBox.xIndex>=0 && _this.oldEnlargeBox.xIndex==i){
-            //   delayAnimation = animationTime;
-            // }
-            // setTimeout(function(){
-            //   lineCharts.resize({
-            //     width:(nextPointX - curPointX),
-            //     height:(nextPointY - curPointY)
-            //   });
-            // },delayAnimation);
           })(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,_this.animationTime,i,j);
           (function(lineCharts,i,j){
             if(hasEnlargeBox && (_this.enlargeBox.xIndex != i || _this.enlargeBox.yIndex!=j)){
@@ -111,6 +103,9 @@
           })(lineCharts,i,j);
         }
       }
+      setTimeout(function(){
+        _this.setOldEnlargeBox();
+      },this.animationTime);
       dataObj ? this.setTodayBoxBorderColor(): null;
     },
     resetLineChartsByDateOrData:function(dataObj,hasEnlargeBox,lineCharts,i,j){  //if update the date or data,we need clear the charts and reset it.
@@ -144,10 +139,10 @@
           setTimeout(function(){
             $(chartContainer).find('.chartContent').removeClass('origin2max');
           },this.animationTime);
-        }else if(x != i && j != j){
-          lineCharts.resize({width:width,height:height});
+        }else if(x != i && y != j){
           $(chartContainer).find('.chartContent').addClass('origin2min');
           setTimeout(function(){
+            lineCharts.resize({width:width,height:height});
             $(chartContainer).find('.chartContent').removeClass('origin2min');
           },this.animationTime);
         }else{
@@ -160,7 +155,7 @@
           }else if(oldx != x && oldy == y){
             className = 'max2miny';
           }else if(oldx == x && oldy != y){
-            className = 'max2minx';
+            className = oldy > y?'max2minxxL':'max2minxxR';
           }
           $(chartContainer).find('.chartContent').addClass(className);
           setTimeout(function(){
@@ -173,7 +168,7 @@
           }else if(oldx != x && oldy == y){
             className = 'min2maxy';
           }else if(oldx == x && oldy != y){
-            className = 'min2maxx';
+            className = oldy > y?'min2maxxL':'min2maxxR';
           }
           lineCharts.resize({width:width,height:height});
           $(chartContainer).find('.chartContent').addClass(className);
@@ -192,8 +187,12 @@
           },this.animationTime);
         }else{
           lineCharts.resize({width:width,height:height});
+          $(chartContainer).find('.chartContent').addClass('min2origin');
+          setTimeout(function(){
+            $(chartContainer).find('.chartContent').removeClass('min2origin');
+          },this.animationTime);
         }
-      }else if(oldx ==-1 && x==-1){ // reset all to primary size.
+      }else if(oldx ==-1 && x==-1){ // just change the size without animation.
         lineCharts.resize({width:width,height:height});
       }
     },
@@ -237,7 +236,6 @@
             if(oldDayIndex != index){
               _this.setLineChartsOptionShow(clickXIndex,clickYIndex,true);
             }
-            _this.setOldEnlargeBox();
             _this.refreshAllOnClick(clickXIndex,clickYIndex);
           };
           this.lineChartsArr[i][j] && this.lineChartsArr[i][j].on('click', function(params){

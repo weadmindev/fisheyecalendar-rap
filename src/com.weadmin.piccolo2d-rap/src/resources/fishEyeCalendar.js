@@ -37,6 +37,8 @@
 				this.lineColor = ['#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3'];
 				this.setLineColor(options.lineColor || {});
 				this.initPathsConfig();
+				this.initParamsConfig();
+				this.initCalendarHeader();
         this.initElement();
 	    },
       initPathsConfig:function(){
@@ -63,8 +65,6 @@
             'echarts/component/tooltip'
           ],function(zrender,echarts) {
 								_this.echarts = echarts;
-                _this.initParamsConfig();
-								_this.initCalendarHeader();
 								_this.detailCurveCharts = new DetailCurveCharts({
 										dataObj:_this.dataObj,
 										xBoxNum:_this.xBoxNum,
@@ -289,6 +289,7 @@
 				this.detailCurveCharts.setPosition(this.leftTopPointArr,dataObj);
 			},
 			refreshBySize:function(size){
+				var _this = this;
 				size.width = size.width<800 ? 800 : size.width;
 				size.height = size.height<400 ? 400 : size.height;
 				this.width = size.width-10;
@@ -296,13 +297,15 @@
 				this.updateParamsAboutSize();
 				this.refreshTextShape();
 				this.refreshCalendarHeader();
-				this.detailCurveCharts.updateOptions({
-					width:this.width,
-					height:this.height
-				});
 				this.detailContainer.style.width = (this.width-this.xStart)+'px';
 				this.detailContainer.style.height = (this.height-this.yStart)+'px';
-				this.detailCurveCharts.setPosition(this.leftTopPointArr);
+				var interval = setInterval(function(){
+					if(_this.detailCurveCharts){
+						clearInterval(interval);
+						_this.detailCurveCharts.updateOptions({width:_this.width,height:_this.height});
+						_this.detailCurveCharts.setPosition(_this.leftTopPointArr);
+					}
+				},50);
 			},
       getWeekDayByDate:function(year,month,day){
         var date = new Date(year+'/'+month+'/'+day);
