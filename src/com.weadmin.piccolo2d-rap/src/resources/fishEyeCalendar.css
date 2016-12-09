@@ -25,167 +25,255 @@
 .chartContent{
 	width:100%;
 	height:100%;
-
-	/*transform: scale(0.216,0.216);*/
+	position: absolute;
+	top: 0;
+	left: 0;
 }
 
 @keyframes max2origin{
-    0% {transform: scale(1,1);}
-    100% {transform: scale(0.216,0.216) translate(-100%,-100%);}
+    0% {transform: scale(1,1);top:0;left:0;}
+    100% {transform: scale(0.2165,0.2386);top:-38%;left:-40%;}
 }
 /* Safari and Chrome */
 @-webkit-keyframes max2origin {
-	0% {transform: scale(1,1);}
-	100% {transform: scale(0.216,0.216) translate(-100%,-100%);}
+	0% {transform: scale(1,1);top:0;left:0;}
+	100% {transform: scale(0.2165,0.2386);top:-38%;left:-40%;}
 }
 .max2origin{
-animation: max2origin 0.6s linear;
+animation: max2origin 3s linear;
 }
+
 /*origin2min*/
 @keyframes origin2min{
-    0% {transform: scale(0.3968,0.3568);}
-    100% {transform: scale(1,1);}
+	0% {transform: scale(1,1);top:0;left:0;}
+	100% {transform: scale(0.3962,0.3588);top:-32.%;left:-30%;}
 }
 /* Safari and Chrome */
 @-webkit-keyframes origin2min {
-	0% {transform: scale(0.3968,0.3568);}
-	100% {transform: scale(1,1);}
+	0% {transform: scale(1,1);top:0;left:0;}
+	100% {transform: scale(0.3962,0.3588);top:-32%;left:-30%;}
 }
 .origin2min{
-animation: origin2min 0.4s linear;
+animation: origin2min 3s linear;
+}
+/*only from primary Y to min size.*/
+@keyframes originY2min{
+	0% {transform: scale(1,1);top:0;}
+	100% {transform: scale(1,0.3588);top:-32%;}
+}
+/* Safari and Chrome */
+@-webkit-keyframes originY2min {
+	0% {transform: scale(1,1);top:0;}
+	100% {transform: scale(1,0.3588);top:-32%;}
+}
+.originY2min{
+animation: originY2min 3s linear;
+}
+/*only from primary X to min size.*/
+@keyframes originX2min{
+	0% {transform: scale(1,1);left:0;}
+	100% {transform: scale(0.3962,1);left:-30%;}
+}
+/* Safari and Chrome */
+@-webkit-keyframes originX2min {
+	0% {transform: scale(1,1);left:0;}
+	100% {transform: scale(0.3962,1);left:-30%;}
+}
+.originX2min{
+animation: originX2min 3s linear;
 }
 
+/*only from primary Y to max size.*/
+@keyframes originY2max{
+	0% {transform: scale(1,0.2386);top:-38%;}
+	100% {transform: scale(1,1) ;top:0;}
+}
+/* Safari and Chrome */
+@-webkit-keyframes originY2max {
+	0% {transform: scale(1,0.2386);top:-38%;}
+	100% {transform: scale(1,1) ;top:0;}
+}
+.originY2max{
+animation: originY2max 3s linear;
+}
+/*only from primary X to max size.*/
+@keyframes originX2max{
+	0% {transform: scale(0.2165,1);left:-40%;}
+	100% {transform: scale(1,1) ;left:0;}
+}
+/* Safari and Chrome */
+@-webkit-keyframes originX2max {
+	0% {transform: scale(0.2165,1);left:-40%;}
+	100% {transform: scale(1,1) ;left:0;}
+}
+.originX2max{
+animation: originX2max 3s linear;
+}
+
+
+
+/*from min to origin, primary size*/
+@keyframes min2origin{
+    0% {transform: scale(0.3962,0.3588) ;top:-32%;left:-30%;}
+    100% {transform: scale(1,1);top:0;left:0;}
+}
+/* Safari and Chrome */
+@-webkit-keyframes min2origin {
+	0% {transform: scale(0.3962,0.3588);top:-32%;left:-30%;}
+	100% {transform: scale(1,1);top:0;left:0;}
+}
+.min2origin{
+animation: min2origin 3s linear;
+}
+
+/*from min X to origin, primary size*/
+@keyframes minX2origin{
+    0% {transform: scale(0.3962,1) ;left:-46%;}
+    100% {transform: scale(1,1);left:0;}
+}
+/* Safari and Chrome */
+@-webkit-keyframes minX2origin {
+	0% {transform: scale(0.3962,1);left:-46%;}
+	100% {transform: scale(1,1);left:0;}
+}
+.minX2origin{
+animation: minX2origin 3s linear;
+}
+/* only from max Y to origin, primary size*/
+@keyframes maxY2origin{
+	0% {transform: scale(1,1);top:0;left:0;}
+	100% {transform: scale(1,0.2386);top:-38%;left:0;}
+}
+/* Safari and Chrome */
+@-webkit-keyframes maxY2origin {
+	0% {transform: scale(1,1);top:0;left:0;}
+	100% {transform: scale(1,0.2386);top:-38%;left:0;}
+}
+.maxY2origin{
+animation: maxY2origin 3s linear;
+}
+
+/*from min Y to origin, primary size*/
+@keyframes minY2origin{
+    0% {transform: scale(4.61,0.3588) ;top:-46%;left:30%;}
+    100% {transform: scale(1,1);top:0;left:0;}
+}
+/* Safari and Chrome */
+@-webkit-keyframes minY2origin {
+	0% {transform: scale(4.61,0.3588);top:-46%;left:30%;}
+	100% {transform: scale(1,1);top:0;left:0;}
+}
+.minY2origin{
+animation: minY2origin 3s linear;
+}
+/*only from max X to origin, primary size*/
+@keyframes maxX2origin{
+	0% {transform: scale(1,1);left:0;}
+	100% {transform: scale(0.2165,1);left:-40%;}
+}
+/* Safari and Chrome */
+@-webkit-keyframes maxX2origin {
+	0% {transform: scale(1,1);left:0;}
+	100% {transform: scale(0.2165,1);left:-40%;}
+}
+.maxX2origin{
+animation: maxX2origin 3s linear;
+}
+
+/*from primary size to max size*/
 @keyframes origin2max{
-    0% {transform: scale(0.216,0.216) translate(-80%,-80%);}
-    100% {transform: scale(1,1) translate(0,0);}
+    0% {transform: scale(0.2165,0.2386);top:-38%;left:-40%;}
+    100% {transform: scale(1,1) ;top:0;left:0;}
 }
-
 /* Safari and Chrome */
 @-webkit-keyframes origin2max {
-	0% {transform: scale(0.216,0.216) translate(-80%,-80%);}
-	100% {transform: scale(1,1) translate(0,0);}
+	0% {transform: scale(0.2165,0.2386);top:-38%;left:-40%;}
+	100% {transform: scale(1,1) ;top:0;left:0;}
 }
 .origin2max{
-animation: origin2max 0.6s linear;
-}
-/*from min to max*/
-@keyframes min2max{
-    0% {transform: scale(0.0859,0.0859) translate(-80%,-80%);}
-    100% {transform: scale(1,1) translate(0,0);}
+animation: origin2max 3s linear;
 }
 
+/*from min to max size*/
+@keyframes min2max{
+    0% {transform: scale(0.0859,0.0859);top:-46%;left:-46%;}
+    100% {transform: scale(1,1);top:0;left:0;}
+}
 /* Safari and Chrome */
 @-webkit-keyframes min2max {
-	0% {transform: scale(0.0859,0.0859) translate(-80%,-80%);}
-	100% {transform: scale(1,1) translate(0,0);}
+	0% {transform: scale(0.0859,0.0859);top:-46%;left:-46%;}
+	100% {transform: scale(1,1);top:0;left:0;}
 }
 .min2max{
-animation: min2max 0.6s linear;
+animation: min2max 3s linear;
 }
+
 /*from min to max y*/
 @keyframes min2maxy{
-    0% {transform: scale(1,0.0859);}
-    100% {transform: scale(1,1);}
+    0% {transform: scale(1,0.0859);top:-46%;}
+    100% {transform: scale(1,1);top:0;}
 }
 /* Safari and Chrome */
 @-webkit-keyframes min2maxy {
-	0% {transform: scale(1,0.0859);}
-	100% {transform: scale(1,1);}
+	0% {transform: scale(1,0.0859);top:-46%;}
+	100% {transform: scale(1,1);top:0;}
 }
 .min2maxy{
-animation: min2maxy 0.6s linear;
+animation: min2maxy 3s linear;
 }
-/*from min to max x ,on old left*/
-@keyframes min2maxxL{
-    0% {transform: scale(0.0859,1) translateX(-80%);}
-    100% {transform: scale(1,1) translateX(0);}
-}
-/* Safari and Chrome */
-@-webkit-keyframes min2maxxL {
-	0% {transform: scale(0.0859,1) translateX(-80%);}
-	100% {transform: scale(1,1) translateX(0);}
-}
-.min2maxxL{
-animation: min2maxxL 0.6s linear;
-}
+
 /*from min to max x ,on old right*/
-@keyframes min2maxxR{
-    0% {transform: scale(0.0859,1);}
-    100% {transform: scale(1,1);}
+@keyframes min2maxx{
+    0% {transform: scale(0.0859,1);left:-46%;}
+    100% {transform: scale(1,1);left:0;}
 }
 /* Safari and Chrome */
-@-webkit-keyframes min2maxxR {
-	0% {transform: scale(0.0859,1);}
-	100% {transform: scale(1,1);}
+@-webkit-keyframes min2maxx {
+	0% {transform: scale(0.0859,1);left:-46%;}
+	100% {transform: scale(1,1);left:0;}
 }
-.min2maxxR{
-animation: min2maxxR 0.6s linear;
+.min2maxx{
+animation: min2maxx 3s linear;
 }
 
 /*from max to min*/
 @keyframes max2min{
-    0% {transform: scale(1,1);}
-    100% {transform: scale(0.0859,0.0859) translate(-130%,-130%);}
+    0% {transform: scale(1,1);top:0;left:0;}
+    100% {transform: scale(0.0859,0.0859);top:-46%;left:-46%;}
 }
 /* Safari and Chrome */
 @-webkit-keyframes max2min {
-	0% {transform: scale(1,1);}
-	100% {transform: scale(0.0859,0.0859) translate(-130%,-130%);}
+	0% {transform: scale(1,1);top:0;left:0;}
+	100% {transform: scale(0.0859,0.0859);top:-46%;left:-46%;}
 }
 .max2min{
-animation: max2min 0.6s linear;
+animation: max2min 3s linear;
 }
 
 /*from max to min y*/
 @keyframes max2miny{
-    0% {transform: scale(1,1);}
-    100% {transform: scale(1,0.0859) translateY(-100%);}
+    0% {transform: scale(1,1);top:0;}
+    100% {transform: scale(1,0.0859);top:-46%;}
 }
 /* Safari and Chrome */
 @-webkit-keyframes max2miny {
-	0% {transform: scale(1,1);}
-	100% {transform: scale(1,0.0859) translateY(-100%);}
+	0% {transform: scale(1,1);top:0;}
+	100% {transform: scale(1,0.0859);top:-46%;}
 }
 .max2miny{
-animation: max2miny 0.6s linear;
+animation: max2miny 3s linear;
 }
 
 /*from max to min x*/
-@keyframes max2minxxR{
-    0% {transform: scale(1,1);}
-    100% {transform: scale(0.0859,1) translateX(-60%);}
+@keyframes max2minx{
+    0% {transform: scale(1,1);left:0;}
+    100% {transform: scale(0.0859,1);left:-46%;}
 }
 /* Safari and Chrome */
-@-webkit-keyframes max2minxxR {
-	0% {transform: scale(1,1);}
-	100% {transform: scale(0.0859,1) translateX(-60%);}
+@-webkit-keyframes max2minx {
+	0% {transform: scale(1,1);left:0;}
+	100% {transform: scale(0.0859,1);left:-46%;}
 }
-.max2minxxR{
-animation: max2minxxR 0.4s linear;
-}
-/*from max to min x*/
-@keyframes max2minxxL{
-    0% {transform: scale(1,1);}
-    100% {transform: scale(0.0859,1) translateX(-100%);}
-}
-/* Safari and Chrome */
-@-webkit-keyframes max2minxxL {
-	0% {transform: scale(1,1);}
-	100% {transform: scale(0.0859,1) translateX(-100%);}
-}
-.max2minxxL{
-animation: max2minxxL 0.4s linear;
-}
-/*from min to origin, primary size*/
-@keyframes min2origin{
-    0% {transform: scale(0.0859,0.0859) translate(-80%,-80%);}
-    100% {transform: scale(1,1) translate(0,0);}
-}
-/* Safari and Chrome */
-@-webkit-keyframes min2origin {
-	0% {transform: scale(0.0859,0.0859) translate(-80%,-80%);}
-	100% {transform: scale(1,1) translate(0,0);}
-}
-.min2origin{
-animation: min2origin 0.6s linear;
+.max2minx{
+animation: max2minx 3s linear;
 }

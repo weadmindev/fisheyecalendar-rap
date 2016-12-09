@@ -25,6 +25,7 @@
       this.canClickEnlarge = true;
       this.isCtrlKeyDown = false;
       this.animationTime = options.animationTime || 1000; // millisecond.
+      this.chartAnimation = 3000;
       this.lineDescMap = {'package':'包成功率(%)','retime':'数据往返时间(ms)'};
       this.lineColor = options.lineColor;
       this.initElement();
@@ -133,68 +134,96 @@
       var originWidth = lineCharts.getWidth();
       var originHeight = lineCharts.getHeight();
       if(oldx ==-1 && x!=-1){ //old has not enlarge box
-        if(x == i && j == j){
-          lineCharts.resize({width:width,height:height});
-          $(chartContainer).find('.chartContent').addClass('origin2max');
-          setTimeout(function(){
-            $(chartContainer).find('.chartContent').removeClass('origin2max');
-          },this.animationTime);
+        if(x == i && y == j){ //zoom in the box,
+          this.chartZoomIn(chartContainer,lineCharts,width,height,'origin2max');
         }else if(x != i && y != j){
-          $(chartContainer).find('.chartContent').addClass('origin2min');
-          setTimeout(function(){
-            lineCharts.resize({width:width,height:height});
-            $(chartContainer).find('.chartContent').removeClass('origin2min');
-          },this.animationTime);
+          this.chartZoomOut(chartContainer,lineCharts,width,height,'origin2min');
+        }else if(x != i && y == j){
+          this.chartZoomOut(chartContainer,lineCharts,'auto',height,'originY2min');
+          this.chartZoomIn(chartContainer,lineCharts,width,'auto','originX2max');
+        }else if(x == i && y != j){
+          this.chartZoomOut(chartContainer,lineCharts,width,'auto','originX2min');
+          this.chartZoomIn(chartContainer,lineCharts,'auto',height,'originY2max');
         }else{
           lineCharts.resize({width:width,height:height});
         }
       }else if(oldx !=-1 && x!=-1){ //old has enlarge box,now has enlarge box
-        if(oldx == i && oldy == j){//to zoomout
+        if(oldx == i && oldy == j){//to zoom out
           if(oldx != x && oldy != y){
             className = 'max2min';
           }else if(oldx != x && oldy == y){
             className = 'max2miny';
           }else if(oldx == x && oldy != y){
-            className = oldy > y?'max2minxxL':'max2minxxR';
+            className = 'max2minx';
           }
-          $(chartContainer).find('.chartContent').addClass(className);
-          setTimeout(function(){
-            lineCharts.resize({width:width,height:height});
-            $(chartContainer).find('.chartContent').removeClass(className);
-          },this.animationTime);
-        }else if(x==i&&y==j){ //to zoomin
+          this.chartZoomOut(chartContainer,lineCharts,width,height,className);
+        }else if(x==i&&y==j){ //to zoomin 放大
           if(oldx != x && oldy != y){
             className = 'min2max';
           }else if(oldx != x && oldy == y){
             className = 'min2maxy';
           }else if(oldx == x && oldy != y){
-            className = oldy > y?'min2maxxL':'min2maxxR';
+            className ='min2maxx';
           }
-          lineCharts.resize({width:width,height:height});
-          $(chartContainer).find('.chartContent').addClass(className);
-          setTimeout(function(){
-            $(chartContainer).find('.chartContent').removeClass(className);
-          },this.animationTime);
+          this.chartZoomIn(chartContainer,lineCharts,width,height,className);
+        }else if(oldx==x && y!=oldy){ //new and old enlarge box in one row.
+          if(j==y){
+            this.chartZoomIn(chartContainer,lineCharts,width,'auto','min2maxx');
+          }else if(j==oldy){
+            this.chartZoomOut(chartContainer,lineCharts,width,'auto','max2minx');
+          }
+        }else if(oldx!=x && y==oldy){ //new and old enlarge box in one col.
+          if(i==x){
+            this.chartZoomIn(chartContainer,lineCharts,'auto',height,'min2maxy');
+          }else if(i==oldx){
+            this.chartZoomOut(chartContainer,lineCharts,'auto',height,'max2miny');
+          }
+        }else if(oldx!=x && y!=oldy){
+          if(i==oldx && j==y){
+            this.chartZoomOut(chartContainer,lineCharts,'auto',height,'max2miny');
+            this.chartZoomIn(chartContainer,lineCharts,width,'auto','min2maxx');
+          }else if(i==x && j==oldy){
+            this.chartZoomOut(chartContainer,lineCharts,width,'auto','max2minx');
+            this.chartZoomIn(chartContainer,lineCharts,'auto',height,'min2maxy');
+          }else if(i==x && j!=oldy){
+            this.chartZoomIn(chartContainer,lineCharts,width,'auto','min2maxx');
+          }else if(i==oldx && j!=y){
+            this.chartZoomOut(chartContainer,lineCharts,'auto',height,'max2miny');
+          }
+          this.chartZoomIn(chartContainer,lineCharts,'auto',height,'minY2origin');
+          this.chartZoomIn(chartContainer,lineCharts,width,'auto','minX2max');
         }else{
           lineCharts.resize({width:width,height:height});
         }
       }else if(oldx !=-1 && x==-1){ // reset all to primary size.
         if(oldx == i && oldy == j){
-          $(chartContainer).find('.chartContent').addClass('max2origin');
-          setTimeout(function(){
-            lineCharts.resize({width:width,height:height});
-            $(chartContainer).find('.chartContent').removeClass('max2origin');
-          },this.animationTime);
+          this.chartZoomOut(chartContainer,lineCharts,width,height,'max2origin');
+        }else if(oldx == i && oldy != j){
+          this.chartZoomIn(chartContainer,lineCharts,width,'auto','minX2origin');
+          this.chartZoomOut(chartContainer,lineCharts,'auto',height,'maxY2origin');
+        }else if(oldx != i && oldy == j){
+          this.chartZoomIn(chartContainer,lineCharts,'auto',height,'minY2origin');
+          this.chartZoomOut(chartContainer,lineCharts,width,'auto','maxX2origin');
         }else{
-          lineCharts.resize({width:width,height:height});
-          $(chartContainer).find('.chartContent').addClass('min2origin');
-          setTimeout(function(){
-            $(chartContainer).find('.chartContent').removeClass('min2origin');
-          },this.animationTime);
+          this.chartZoomIn(chartContainer,lineCharts,width,height,'min2origin');
         }
       }else if(oldx ==-1 && x==-1){ // just change the size without animation.
         lineCharts.resize({width:width,height:height});
       }
+    },
+    chartZoomOut:function(chartContainer,lineCharts,width,height,className){ //缩小图形。
+      $(chartContainer).find('.chartContent').addClass(className);
+      setTimeout(function(){
+        lineCharts.resize({width:width,height:height});
+        $(chartContainer).find('.chartContent').removeClass(className);
+      },this.chartAnimation);
+    },
+    chartZoomIn:function(chartContainer,lineCharts,width,height,className){ //放大图形。
+      lineCharts.resize({width:width,height:height});
+      $(chartContainer).find('.chartContent').addClass(className);
+      setTimeout(function(){
+        $(chartContainer).find('.chartContent').removeClass(className);
+      },this.chartAnimation);
     },
     updateOptions:function(options){
       for(var key in options){
