@@ -25,7 +25,7 @@
       this.canClickEnlarge = true;
       this.isCtrlKeyDown = false;
       this.animationTime = options.animationTime || 1000; // millisecond.
-      this.chartAnimation = 3000;
+      this.chartAnimation = 600;
       this.lineDescMap = {'package':'包成功率(%)','retime':'数据往返时间(ms)'};
       this.lineColor = options.lineColor;
       this.initElement();
@@ -139,11 +139,11 @@
         }else if(x != i && y != j){
           this.chartZoomOut(chartContainer,lineCharts,width,height,'origin2min');
         }else if(x != i && y == j){
-          this.chartZoomOut(chartContainer,lineCharts,'auto',height,'originY2min');
-          this.chartZoomIn(chartContainer,lineCharts,width,'auto','originX2max');
+          this.chartZoomOut(chartContainer,lineCharts,width,height,'originY2min');
+          this.chartZoomIn(chartContainer,lineCharts,width,height,'originX2max');
         }else if(x == i && y != j){
-          this.chartZoomOut(chartContainer,lineCharts,width,'auto','originX2min');
-          this.chartZoomIn(chartContainer,lineCharts,'auto',height,'originY2max');
+          this.chartZoomOut(chartContainer,lineCharts,width,height,'originX2min');
+          this.chartZoomIn(chartContainer,lineCharts,width,height,'originY2max');
         }else{
           lineCharts.resize({width:width,height:height});
         }
@@ -168,30 +168,35 @@
           this.chartZoomIn(chartContainer,lineCharts,width,height,className);
         }else if(oldx==x && y!=oldy){ //new and old enlarge box in one row.
           if(j==y){
-            this.chartZoomIn(chartContainer,lineCharts,width,'auto','min2maxx');
+            this.chartZoomIn(chartContainer,lineCharts,width,height,'min2maxx');
           }else if(j==oldy){
-            this.chartZoomOut(chartContainer,lineCharts,width,'auto','max2minx');
+            this.chartZoomOut(chartContainer,lineCharts,width,height,'max2minx');
           }
         }else if(oldx!=x && y==oldy){ //new and old enlarge box in one col.
           if(i==x){
-            this.chartZoomIn(chartContainer,lineCharts,'auto',height,'min2maxy');
+            this.chartZoomIn(chartContainer,lineCharts,width,height,'min2maxy');
           }else if(i==oldx){
-            this.chartZoomOut(chartContainer,lineCharts,'auto',height,'max2miny');
+            this.chartZoomOut(chartContainer,lineCharts,width,height,'max2miny');
           }
         }else if(oldx!=x && y!=oldy){
-          if(i==oldx && j==y){
-            this.chartZoomOut(chartContainer,lineCharts,'auto',height,'max2miny');
-            this.chartZoomIn(chartContainer,lineCharts,width,'auto','min2maxx');
-          }else if(i==x && j==oldy){
-            this.chartZoomOut(chartContainer,lineCharts,width,'auto','max2minx');
+          if(i==x){
             this.chartZoomIn(chartContainer,lineCharts,'auto',height,'min2maxy');
-          }else if(i==x && j!=oldy){
-            this.chartZoomIn(chartContainer,lineCharts,width,'auto','min2maxx');
-          }else if(i==oldx && j!=y){
-            this.chartZoomOut(chartContainer,lineCharts,'auto',height,'max2miny');
           }
-          this.chartZoomIn(chartContainer,lineCharts,'auto',height,'minY2origin');
-          this.chartZoomIn(chartContainer,lineCharts,width,'auto','minX2max');
+          if(j==y){
+            this.chartZoomIn(chartContainer,lineCharts,width,'auto','min2maxx');
+          }
+          if(i==oldx){
+            this.chartZoomOut(chartContainer,lineCharts,'auto',height,'max2miny');
+            setTimeout(function(){
+              lineCharts.resize({width:width,height:height});
+            },this.chartAnimation+50);
+          }
+          if(j==oldy){
+            this.chartZoomOut(chartContainer,lineCharts,width,'auto','max2minx');
+            setTimeout(function(){
+              lineCharts.resize({width:width,height:height});
+            },this.chartAnimation+50);
+          }
         }else{
           lineCharts.resize({width:width,height:height});
         }
@@ -201,9 +206,15 @@
         }else if(oldx == i && oldy != j){
           this.chartZoomIn(chartContainer,lineCharts,width,'auto','minX2origin');
           this.chartZoomOut(chartContainer,lineCharts,'auto',height,'maxY2origin');
+          setTimeout(function(){
+            lineCharts.resize({width:width,height:height});
+          },this.chartAnimation+50);
         }else if(oldx != i && oldy == j){
           this.chartZoomIn(chartContainer,lineCharts,'auto',height,'minY2origin');
           this.chartZoomOut(chartContainer,lineCharts,width,'auto','maxX2origin');
+          setTimeout(function(){
+            lineCharts.resize({width:width,height:height});
+          },this.chartAnimation+50);
         }else{
           this.chartZoomIn(chartContainer,lineCharts,width,height,'min2origin');
         }

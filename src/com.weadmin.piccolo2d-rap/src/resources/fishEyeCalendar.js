@@ -27,7 +27,7 @@
         this.enlargeBox = {xIndex:-1,yIndex:-1}; //
 				this.headerTextList = []; //
 				this.leftTopPointArr = []; //the left and top point of each box ,and the day number of the month.
-				this.animationTime = 3000; // millisecond.
+				this.animationTime = 600; // millisecond.
 				this.echarts = null;  //
 				this.detailCurveCharts = null;
 				this.todayDate = options.currentDay;
@@ -277,7 +277,6 @@
 				var interval = setInterval(function(){
 					if(_this.detailCurveCharts){
 						clearInterval(interval);
-						console.log('setInterval:------');
 						 _this.refreshCurveCharts(dataObj);
 					}
 				},50);

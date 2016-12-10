@@ -108,26 +108,23 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		showList:function(){  //update calendar call
 			var _this = this;
 			// this._dataObj = obj;
-			console.log('showList:-----',this._dataObj);
-			this.fishEyeCalendar && this.fishEyeCalendar.updateCalendarByDateAndData(this._date.getFullYear(),this._date.getMonth()+1,this._dataObj,this._isDefaulOpenToday,this._lineColor);
-			// var area = this.parent.getClientArea();
-			// if(area[2] == this._size.width && area[3] == this._size.height){ return; }
-			// // console.log('showList:size',area);
-			// this._size = {width:area[2],height:area[3]};
-			// setTimeout(function(){
-			// 	_this.refreshSize(area[0],area[1],area[2],area[3]);
-			// },100);
+			setTimeout(function(){
+				// console.log('showList:-----',_this._dataObj);
+				_this.fishEyeCalendar && _this.fishEyeCalendar.updateCalendarByDateAndData(
+					_this._date.getFullYear(),
+					_this._date.getMonth()+1,
+					_this._dataObj,
+					_this._isDefaulOpenToday,
+					_this._lineColor);
+			},50);
 		},
 		setSize : function(size) {
 			var _this = this;
 			if (this.ready) {
-				console.log('async:size',size);
-				if(size.width == _this._size.width && size.height == _this._size.height){ return; }
+				if(Math.abs(size.width-_this._size.width)<5 && Math.abs(size.height-_this._size.height)<5){ return; }
+				// console.log('async:size',size);
 				async(this, function() { // Needed by IE for some reason
 					_this.refreshSize(0,0,size.width,size.height);
-					// _this.element.style.width = size.width+"px";
-					// _this.element.style.height = (size.height-20)+"px";
-					// _this.fishEyeCalendar.refreshBySize(_this._size);
 				});
 			} else {
 				this._size = size;
@@ -142,8 +139,8 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			// console.log("piccolo2djs...layout..")
 			if (this.ready) {
 				var area = this.parent.getClientArea();
-        console.log("this.parent.getClientArea():",area);
-				if(area[2] == this._size.width && area[3] == this._size.height){ return; }
+				if(Math.abs(area[2]-this._size.width)<5 && Math.abs(area[3]-this._size.height)<5){ return; }
+				// console.log("this.parent.getClientArea():",area);
 				this.refreshSize(area[0],area[1],area[2],area[3]);
 			}
 		},
