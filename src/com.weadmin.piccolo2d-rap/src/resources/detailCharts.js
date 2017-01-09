@@ -24,8 +24,9 @@
       this.lineChartsArr = [];
       this.canClickEnlarge = true;
       this.isCtrlKeyDown = false;
-      this.animationTime = options.animationTime || 1000; // millisecond.
-      this.chartAnimation = 600;
+      this.isAnimating = false;
+      this.animationTime = options.animationTime; // millisecond.
+      this.chartAnimation = 700; //generaly, this is same with animationTime.
       this.lineDescMap = {'package':'包成功率(%)','retime':'数据往返时间(ms)'};
       this.lineColor = options.lineColor;
       this.initElement();
@@ -126,6 +127,7 @@
       $(ele).find('.chartDayText').text(leftTop.text);
     },
     refreshZoomAnimation:function(i,j,width,height){
+      var _this = this;
       var chartContainer = this.chartContainerArr[i][j];
       var lineCharts = this.lineChartsArr[i][j];
       var oldx = this.oldEnlargeBox.xIndex, oldy = this.oldEnlargeBox.yIndex;
@@ -135,7 +137,9 @@
       var originHeight = lineCharts.getHeight();
       if(oldx ==-1 && x!=-1){ //old has not enlarge box
         if(x == i && y == j){ //zoom in the box,
-          this.chartZoomIn(chartContainer,lineCharts,width,height,'origin2max');
+          // setTimeout(function(){
+          // },10);
+          _this.chartZoomIn(chartContainer,lineCharts,width,height,'origin2max');
         }else if(x != i && y != j){
           this.chartZoomOut(chartContainer,lineCharts,width,height,'origin2min');
         }else if(x != i && y == j){
@@ -256,6 +260,9 @@
           this.chartContainerArr[i][j].onclick = function(e){
             if(!_this.canClickEnlarge){return;}
             if(!_this.canResponseEvent(e)){return;}
+            if(_this.isAnimating){ return;}
+            _this.isAnimating = true;
+            setTimeout(function(){_this.isAnimating = false},_this.animationTime);
             var flag = e.currentTarget.getAttribute('data-flag');
             var index = +e.currentTarget.getAttribute('data-index');
             var rowNum = _this.leftTopPointArr.length;
@@ -311,11 +318,13 @@
         }
       }
     },
-    canResponseEvent:function(e){
+    canResponseEvent:function(e){ //if click the day after today,return false, indicate can not click.
       var canResponse = true;
       var xIndex = +e.currentTarget.getAttribute('data-xindex');
       var yIndex = +e.currentTarget.getAttribute('data-yindex');
-      if(this.todayIndex.yIndex>=0 && xIndex*this.xBoxNum+yIndex > this.todayIndex.xIndex*this.xBoxNum+this.todayIndex.yIndex){canResponse = false;}
+      if(this.todayIndex.yIndex>=0 && xIndex*this.xBoxNum+yIndex > this.todayIndex.xIndex*this.xBoxNum+this.todayIndex.yIndex){
+        canResponse = false;
+      }
       return canResponse;
     },
     setEnlargeBox:function(enlargeBox){
@@ -376,6 +385,11 @@
           });
         }
       }
+      var startTime = this.animationTime+i*10;
+      // var startTime = i*50+j*100;
+      if(!isShow){
+        startTime = 0;
+      }
       setTimeout(function(){
         lineCharts && lineCharts.setOption({
           yAxis:[{
@@ -388,7 +402,7 @@
           }],
           series: seriesList
         });
-      },i*50+j*100);
+      },startTime);
     },
     getlegendListByDay:function(dayTxt,flag){
       var arr = [];

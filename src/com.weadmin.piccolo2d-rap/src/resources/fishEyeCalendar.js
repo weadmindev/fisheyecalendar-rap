@@ -27,7 +27,7 @@
         this.enlargeBox = {xIndex:-1,yIndex:-1}; //
 				this.headerTextList = []; //
 				this.leftTopPointArr = []; //the left and top point of each box ,and the day number of the month.
-				this.animationTime = 600; // millisecond.
+				this.animationTime = 700; // millisecond.
 				this.echarts = null;  //
 				this.detailCurveCharts = null;
 				this.todayDate = options.currentDay;
@@ -174,9 +174,6 @@
 					this.headerTextList[i] = $el;
 				}
 			},
-      addEvent:function(){
-				var _this = this;
-      },
 			getBoxNumText:function(i,j,days){ //get the day number in some box.
 				if(i==0 && this.firstDayWeekIndex>j){
 					return {flag:'prev',text:this.prevMonthDays-this.firstDayWeekIndex+j+1};

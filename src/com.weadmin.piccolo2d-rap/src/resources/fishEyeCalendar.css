@@ -40,7 +40,7 @@
 	100% {transform: scale(0.2165,0.2386);top:-38%;left:-40%;}
 }
 .max2origin{
-animation: max2origin 0.6s linear;
+animation: max2origin 0.7s linear;
 }
 
 /*origin2min*/
@@ -54,7 +54,7 @@ animation: max2origin 0.6s linear;
 	100% {transform: scale(0.3962,0.3588);top:-32%;left:-30%;}
 }
 .origin2min{
-animation: origin2min 0.6s linear;
+animation: origin2min 0.7s linear;
 }
 /*only from primary Y to min size.*/
 @keyframes originY2min{
@@ -67,7 +67,7 @@ animation: origin2min 0.6s linear;
 	100% {transform: scale(1,0.3588);top:-32%;}
 }
 .originY2min{
-animation: originY2min 0.6s linear;
+animation: originY2min 0.7s linear;
 }
 /*only from primary X to min size.*/
 @keyframes originX2min{
@@ -80,7 +80,7 @@ animation: originY2min 0.6s linear;
 	100% {transform: scale(0.3962,1);left:-30%;}
 }
 .originX2min{
-animation: originX2min 0.6s linear;
+animation: originX2min 0.7s linear;
 }
 
 /*only from primary Y to max size.*/
@@ -94,7 +94,7 @@ animation: originX2min 0.6s linear;
 	100% {transform: scale(1,1) ;top:0;}
 }
 .originY2max{
-animation: originY2max 0.6s linear;
+animation: originY2max 0.7s linear;
 }
 /*only from primary X to max size.*/
 @keyframes originX2max{
@@ -107,7 +107,7 @@ animation: originY2max 0.6s linear;
 	100% {transform: scale(1,1) ;left:0;}
 }
 .originX2max{
-animation: originX2max 0.6s linear;
+animation: originX2max 0.7s linear;
 }
 
 
@@ -123,7 +123,7 @@ animation: originX2max 0.6s linear;
 	100% {transform: scale(1,1);top:0;left:0;}
 }
 .min2origin{
-animation: min2origin 0.6s linear;
+animation: min2origin 0.7s linear;
 }
 
 /*from min X to origin, primary size*/
@@ -137,7 +137,7 @@ animation: min2origin 0.6s linear;
 	100% {transform: scale(1,1);left:0;}
 }
 .minX2origin{
-animation: minX2origin 0.6s linear;
+animation: minX2origin 0.7s linear;
 }
 /* only from max Y to origin, primary size*/
 @keyframes maxY2origin{
@@ -150,7 +150,7 @@ animation: minX2origin 0.6s linear;
 	100% {transform: scale(1,0.2386);top:-38%;left:0;}
 }
 .maxY2origin{
-animation: maxY2origin 0.6s linear;
+animation: maxY2origin 0.7s linear;
 }
 
 /*from min Y to origin, primary size*/
@@ -164,7 +164,7 @@ animation: maxY2origin 0.6s linear;
 	100% {transform: scale(1,1);top:0;left:0;}
 }
 .minY2origin{
-animation: minY2origin 0.6s linear;
+animation: minY2origin 0.7s linear;
 }
 /*only from max X to origin, primary size*/
 @keyframes maxX2origin{
@@ -177,7 +177,7 @@ animation: minY2origin 0.6s linear;
 	100% {transform: scale(0.2165,1);left:-40%;}
 }
 .maxX2origin{
-animation: maxX2origin 0.6s linear;
+animation: maxX2origin 0.7s linear;
 }
 
 /*from primary size to max size*/
@@ -191,7 +191,7 @@ animation: maxX2origin 0.6s linear;
 	100% {transform: scale(1,1) ;top:0;left:0;}
 }
 .origin2max{
-animation: origin2max 0.6s linear;
+animation: origin2max 0.7s linear;
 }
 
 /*from min to max size*/
@@ -205,7 +205,7 @@ animation: origin2max 0.6s linear;
 	100% {transform: scale(1,1);top:0;left:0;}
 }
 .min2max{
-animation: min2max 0.6s linear;
+animation: min2max 0.7s linear;
 }
 
 /*from min to max y*/
@@ -219,7 +219,7 @@ animation: min2max 0.6s linear;
 	100% {transform: scale(1,1);top:0;}
 }
 .min2maxy{
-animation: min2maxy 0.6s linear;
+animation: min2maxy 0.7s linear;
 }
 
 /*from min to max x ,on old right*/
@@ -233,7 +233,7 @@ animation: min2maxy 0.6s linear;
 	100% {transform: scale(1,1);left:0;}
 }
 .min2maxx{
-animation: min2maxx 0.6s linear;
+animation: min2maxx 0.7s linear;
 }
 
 /*from max to min*/
@@ -247,7 +247,7 @@ animation: min2maxx 0.6s linear;
 	100% {transform: scale(0.0859,0.0859);top:-46%;left:-46%;}
 }
 .max2min{
-animation: max2min 0.6s linear;
+animation: max2min 0.7s linear;
 }
 
 /*from max to min y*/
@@ -261,7 +261,7 @@ animation: max2min 0.6s linear;
 	100% {transform: scale(1,0.0859);top:-46%;}
 }
 .max2miny{
-animation: max2miny 0.6s linear;
+animation: max2miny 0.7s linear;
 }
 
 /*from max to min x*/
@@ -275,5 +275,5 @@ animation: max2miny 0.6s linear;
 	100% {transform: scale(0.0859,1);left:-46%;}
 }
 .max2minx{
-animation: max2minx 0.6s linear;
+animation: max2minx 0.7s linear;
 }
