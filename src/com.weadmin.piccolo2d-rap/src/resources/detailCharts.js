@@ -65,10 +65,7 @@
       this.setTodayBoxBorderColor();
     },
     setPosition:function(leftTopPointArr,dataObj){
-      if(dataObj){
-        this.dataObj = dataObj;
-        this.setOldEnlargeBox();
-      }
+
       var _this = this;
       this.leftTopPointArr = leftTopPointArr;
       var hasEnlargeBox = this.hasEnlargeBox();
@@ -84,7 +81,7 @@
           var nextPointX = ((j==colNum-1) ? this.width : rowList[j+1]['x']) -this.xStart; //next X point coordinate.
           var chartContainer = this.chartContainerArr[i][j];
           var lineCharts = this.lineChartsArr[i][j];
-          this.resetLineChartsByDateOrData(dataObj,hasEnlargeBox,lineCharts,i,j);
+          // this.resetLineChartsByDateOrData(dataObj,hasEnlargeBox,lineCharts,i,j);
           (function(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,animationTime,i,j){
             setTimeout(function(){
               $(chartContainer).animate({
@@ -108,23 +105,39 @@
       setTimeout(function(){
         _this.setOldEnlargeBox();
       },this.animationTime);
-      dataObj ? this.setTodayBoxBorderColor(): null;
     },
-    resetLineChartsByDateOrData:function(dataObj,hasEnlargeBox,lineCharts,i,j){  //if update the date or data,we need clear the charts and reset it.
-      if(!dataObj){return};
-      var leftTop = this.leftTopPointArr[i][j];
-      var ele = this.chartContainerArr[i][j];
-      lineCharts && lineCharts.clear();
-      lineCharts && lineCharts.setOption(this.getChartData(leftTop.text,leftTop.flag));
-      (hasEnlargeBox && (this.enlargeBox.xIndex == i && this.enlargeBox.yIndex==j)) && this.setLineChartsOptionShow(i,j,true,1);
-      ele.style.backgroundColor= leftTop.flag=='current' ? '#fff' : '#D8DBE4';
-      ele.setAttribute('data-flag',leftTop.flag);
-      ele.setAttribute('data-index',leftTop.text);
-      ele.setAttribute('data-xindex',i);
-      ele.setAttribute('data-yindex',j);
-      ele.style.boxShadow='0 0 0 0 #fff';
-      ele.style.zIndex=99;
-      $(ele).find('.chartDayText').text(leftTop.text);
+    resetLineChartsByDateOrData:function(leftTopPointArr,dataObj){  //if update the date or data,we need clear the charts and reset it.
+      var _this = this;
+      if(dataObj){
+        this.dataObj = dataObj;
+        this.setOldEnlargeBox();
+      }
+      this.leftTopPointArr = leftTopPointArr;
+      var hasEnlargeBox = this.hasEnlargeBox();
+      var rowNum = leftTopPointArr.length;
+      var colNum = leftTopPointArr[0].length;
+      for(var i=0;i<rowNum;i++){
+        var rowList = leftTopPointArr[i];
+        var curPointY = leftTopPointArr[i][0]['y']-this.yStart;
+        var nextPointY = ((i==rowNum-1) ? this.height : leftTopPointArr[i+1][0]['y']) -this.yStart; //next Y point coordinate
+        for(var j=0;j<colNum;j++){
+          var leftTop = this.leftTopPointArr[i][j];
+          var ele = this.chartContainerArr[i][j];
+          var lineCharts = this.lineChartsArr[i][j];
+          lineCharts && lineCharts.clear();
+          lineCharts && lineCharts.setOption(this.getChartData(leftTop.text,leftTop.flag));
+          (hasEnlargeBox && (this.enlargeBox.xIndex == i && this.enlargeBox.yIndex==j)) && this.setLineChartsOptionShow(i,j,true,1);
+          ele.style.backgroundColor= leftTop.flag=='current' ? '#fff' : '#D8DBE4';
+          ele.setAttribute('data-flag',leftTop.flag);
+          ele.setAttribute('data-index',leftTop.text);
+          ele.setAttribute('data-xindex',i);
+          ele.setAttribute('data-yindex',j);
+          ele.style.boxShadow='0 0 0 0 #fff';
+          ele.style.zIndex=99;
+          $(ele).find('.chartDayText').text(leftTop.text);
+        }
+      }
+      dataObj ? this.setTodayBoxBorderColor(): null;
     },
     refreshZoomAnimation:function(i,j,width,height){
       var _this = this;
@@ -262,7 +275,7 @@
             if(!_this.canResponseEvent(e)){return;}
             if(_this.isAnimating){ return;}
             _this.isAnimating = true;
-            setTimeout(function(){_this.isAnimating = false},_this.animationTime);
+            setTimeout(function(){_this.isAnimating = false},_this.animationTime+100);
             var flag = e.currentTarget.getAttribute('data-flag');
             var index = +e.currentTarget.getAttribute('data-index');
             var rowNum = _this.leftTopPointArr.length;
@@ -326,6 +339,9 @@
         canResponse = false;
       }
       return canResponse;
+    },
+    getIsAnimatingState:function(){
+      return this.isAnimating;
     },
     setEnlargeBox:function(enlargeBox){
       this.enlargeBox = enlargeBox;

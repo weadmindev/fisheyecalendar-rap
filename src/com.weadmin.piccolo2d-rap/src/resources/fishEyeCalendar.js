@@ -51,6 +51,7 @@
 								'echarts/chart/line':this.basePath+'echarts.min',
 								'echarts/component/legend':this.basePath+'echarts.min',
 								'echarts/component/grid':this.basePath+'echarts.min',
+								'echarts/component/series':this.basePath+'echarts.min',
 								'echarts/component/dataZoomInside':this.basePath+'echarts.min'
             }
         });
@@ -61,7 +62,8 @@
 						'echarts',
             'echarts/chart/line',
             'echarts/component/legend',
-            'echarts/component/grid',
+						'echarts/component/grid',
+            'echarts/component/series',
             'echarts/component/tooltip'
           ],function(zrender,echarts) {
 								_this.echarts = echarts;
@@ -272,17 +274,23 @@
 				}
 				this.setLineColor(lineColor ||{});
 				var interval = setInterval(function(){
-					if(_this.detailCurveCharts){
-						clearInterval(interval);
-						 _this.refreshCurveCharts(dataObj);
+					if(_this.detailCurveCharts){ //判断对象是否已经存在。
+						if(!_this.detailCurveCharts.getIsAnimatingState()){
+							clearInterval(interval);
+							_this.refreshCurveCharts(dataObj);
+						}
 					}
 				},50);
 			},
 			refreshCurveCharts:function(dataObj){
+				var _this = this;
 				this.detailCurveCharts.setFirstDayWeekIndex(this.firstDayWeekIndex);
 				this.detailCurveCharts.setLineColor(this.lineColor);
 				// this.refreshTextShape();
-				this.detailCurveCharts.setPosition(this.leftTopPointArr,dataObj);
+				this.detailCurveCharts.resetLineChartsByDateOrData(this.leftTopPointArr,dataObj);
+				setTimeout(function(){
+					_this.detailCurveCharts.setPosition(_this.leftTopPointArr);
+				},100);
 			},
 			refreshBySize:function(size){
 				var _this = this;
