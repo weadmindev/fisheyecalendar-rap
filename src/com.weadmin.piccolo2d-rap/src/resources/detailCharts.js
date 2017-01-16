@@ -387,9 +387,12 @@
       var leftTop = this.leftTopPointArr[i][j];
       var seriesList = [];
       if(this.dataObj[leftTop.flag] && this.dataObj[leftTop.flag][leftTop.text]){
+        var legendDescArr = this.getlegendListByDay(leftTop.text,leftTop.flag);
         var linesArr = this.dataObj[leftTop.flag][leftTop.text];
         for(var i=0;i<linesArr.length;i++){
           seriesList.push({
+            name:legendDescArr[i],
+            type:'line',
             showSymbol :isShow,
             lineStyle:{
               normal:{

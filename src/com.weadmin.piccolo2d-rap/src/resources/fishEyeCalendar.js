@@ -51,7 +51,7 @@
 								'echarts/chart/line':this.basePath+'echarts.min',
 								'echarts/component/legend':this.basePath+'echarts.min',
 								'echarts/component/grid':this.basePath+'echarts.min',
-								'echarts/component/series':this.basePath+'echarts.min',
+								// 'echarts/component/series':this.basePath+'echarts.min',
 								'echarts/component/dataZoomInside':this.basePath+'echarts.min'
             }
         });
@@ -63,7 +63,7 @@
             'echarts/chart/line',
             'echarts/component/legend',
 						'echarts/component/grid',
-            'echarts/component/series',
+            // 'echarts/component/series',
             'echarts/component/tooltip'
           ],function(zrender,echarts) {
 								_this.echarts = echarts;
