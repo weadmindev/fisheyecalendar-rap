@@ -48,9 +48,9 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		this.detailChartContainer.style.width = "100%";
 		this.detailChartContainer.style.height = "100%";
 		this.element.appendChild(this.detailChartContainer);
-		
-		this.refreshSize = this.debounce(this.refreshSizeOrigin,500,true);
-		this.showListDebounce = this.debounce(this.showListOrigin,300,true);
+
+		this.refreshSize = this.debounce(this.refreshSizeOrigin,300);
+		this.showListDebounce = this.debounce(this.showListOrigin,400);
 		rap.on("render", this.onRender);
 	};
 	eclipsesource.piccolo2djs.prototype = {
