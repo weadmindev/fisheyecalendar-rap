@@ -19,7 +19,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 	}
 
 	eclipsesource.piccolo2djs = function(properties) {
-		bindAll(this, [ "layout", "onReady", "onSend", "onRender","refreshSize","debounce"]);
+		bindAll(this, [ "layout", "onReady", "onSend", "onRender","refreshSize","debounce","showListOrigin"]);
 		this.parent = rap.getObject(properties.parent); //获取java端的一个图形容器。
 		this.element = document.createElement("div");
 		this.parent.append(this.element);
@@ -48,6 +48,9 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		this.detailChartContainer.style.width = "100%";
 		this.detailChartContainer.style.height = "100%";
 		this.element.appendChild(this.detailChartContainer);
+		
+		this.refreshSize = this.debounce(this.refreshSizeOrigin,500,true);
+		this.showListDebounce = this.debounce(this.showListOrigin,300,true);
 		rap.on("render", this.onRender);
 	};
 	eclipsesource.piccolo2djs.prototype = {
@@ -66,7 +69,6 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				rap.off("render", this.onRender);
 				console.log("piccolo2djs...onRender..");
 				// Creates the graph inside the given container
-				this.refreshSize = this.debounce(this.refreshSizeOrigin,500,true);
 				this.fishEyeCalendar = new FishEyeCalendar({
 					year:this._date.getFullYear(),
 					month:this._date.getMonth()+1,
@@ -107,6 +109,9 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			// console.log('_isDefaulOpenToday:',isOpen);
 		},
 		showList:function(){  //update calendar call
+			this.showListDebounce();
+		},
+		showListOrigin:function(){
 			var _this = this;
 			// this._dataObj = obj;
 			setTimeout(function(){
