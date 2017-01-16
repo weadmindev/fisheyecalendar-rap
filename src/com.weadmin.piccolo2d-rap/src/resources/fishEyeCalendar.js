@@ -246,7 +246,7 @@
 					}
 				}
 			},
-			refreshCalendarHeader:function(){
+			refreshCalendarHeader:function(animationTime){
 				//refresh calendar header's position of week text.
 				var firstRowPointArr = this.leftTopPointArr[0];
 				for(i = 0; i < firstRowPointArr.length; i++){
@@ -256,7 +256,7 @@
 					var headerText = this.headerTextList[i];
 					headerText.animate({
 						left:xPoint+'px'
-					},this.animationTime,'linear');
+					},animationTime || this.animationTime,'linear');
 				}
 			},
 			updateCalendarByDateAndData:function(year,month,dataObj,isDefaulOpenToday,lineColor){  //change the calendar shape by change the year/month and data.
@@ -274,11 +274,9 @@
 				}
 				this.setLineColor(lineColor ||{});
 				var interval = setInterval(function(){
-					if(_this.detailCurveCharts){ //判断对象是否已经存在。
-						if(!_this.detailCurveCharts.getIsAnimatingState()){
-							clearInterval(interval);
-							_this.refreshCurveCharts(dataObj);
-						}
+					if(_this.detailCurveCharts && !_this.detailCurveCharts.getIsAnimatingState()){ //判断对象是否已经存在。
+						clearInterval(interval);
+						_this.refreshCurveCharts(dataObj);
 					}
 				},50);
 			},
@@ -288,9 +286,7 @@
 				this.detailCurveCharts.setLineColor(this.lineColor);
 				// this.refreshTextShape();
 				this.detailCurveCharts.resetLineChartsByDateOrData(this.leftTopPointArr,dataObj);
-				setTimeout(function(){
-					_this.detailCurveCharts.setPosition(_this.leftTopPointArr);
-				},100);
+				_this.detailCurveCharts.setPosition(_this.leftTopPointArr);
 			},
 			refreshBySize:function(size){
 				var _this = this;
@@ -300,14 +296,14 @@
 				this.height = size.height-10;
 				this.updateParamsAboutSize();
 				this.refreshTextShape();
-				this.refreshCalendarHeader();
+				this.refreshCalendarHeader(300);
 				this.detailContainer.style.width = (this.width-this.xStart)+'px';
 				this.detailContainer.style.height = (this.height-this.yStart)+'px';
 				var interval = setInterval(function(){
-					if(_this.detailCurveCharts){
+					if(_this.detailCurveCharts && !_this.detailCurveCharts.getIsAnimatingState()){
 						clearInterval(interval);
 						_this.detailCurveCharts.updateOptions({width:_this.width,height:_this.height});
-						_this.detailCurveCharts.setPosition(_this.leftTopPointArr);
+						_this.detailCurveCharts.setPosition(_this.leftTopPointArr,null,250);
 					}
 				},50);
 			},

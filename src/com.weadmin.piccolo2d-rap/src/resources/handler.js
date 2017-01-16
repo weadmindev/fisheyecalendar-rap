@@ -19,7 +19,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 	}
 
 	eclipsesource.piccolo2djs = function(properties) {
-		bindAll(this, [ "layout", "onReady", "onSend", "onRender","refreshSize"]);
+		bindAll(this, [ "layout", "onReady", "onSend", "onRender","refreshSize","debounce"]);
 		this.parent = rap.getObject(properties.parent); //获取java端的一个图形容器。
 		this.element = document.createElement("div");
 		this.parent.append(this.element);
@@ -66,6 +66,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				rap.off("render", this.onRender);
 				console.log("piccolo2djs...onRender..");
 				// Creates the graph inside the given container
+				this.refreshSize = this.debounce(this.refreshSizeOrigin,500,true);
 				this.fishEyeCalendar = new FishEyeCalendar({
 					year:this._date.getFullYear(),
 					month:this._date.getMonth()+1,
@@ -78,7 +79,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 					detailContainer:this.detailChartContainer
 				});
         /////////////////////
-				rap.on("send", this.onSend);
+				// rap.on("send", this.onSend);
 				this.ready = true;
 				// this.layout();
 			}
@@ -86,7 +87,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 		onSend : function() {
 			// rap.getRemoteObject( this ).set( "model", "123456789"); //设置后端的值，还有其他两个方法:call(method,properties):调用后端的方法,notify(event,properties);
 			// rap.getRemoteObject( this ).call( "handleCallRefreshData", "123456789"); //设置后端的值，还有其他两个方法:call(method,properties):调用后端的方法,notify(event,properties);
-			console.log("mxgraph...onSend..")
+			// console.log("mxgraph...onSend..")
 		},
 		setDate:function(obj){
 			this._date = new Date(obj.date.replace(/\-/g,'/'))
@@ -116,13 +117,13 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 					_this._dataObj,
 					_this._isDefaulOpenToday,
 					_this._lineColor);
-			},50);
+			},10);
 		},
 		setSize : function(size) {
 			var _this = this;
 			if (this.ready) {
 				if(Math.abs(size.width-_this._size.width)<5 && Math.abs(size.height-_this._size.height)<5){ return; }
-				// console.log('async:size',size);
+				console.log('async:size',size);
 				async(this, function() { // Needed by IE for some reason
 					_this.refreshSize(0,0,size.width,size.height);
 				});
@@ -131,7 +132,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			}
 		},
 		destroy : function() {
-			rap.off("send", this.onSend);
+			// rap.off("send", this.onSend);
 			(this.element && this.element.parentNode) ? this.element.parentNode.removeChild(this.element): null;
 		},
 
@@ -144,15 +145,46 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 				this.refreshSize(area[0],area[1],area[2],area[3]);
 			}
 		},
-		refreshSize:function(left,top,width,height){
+		refreshSizeOrigin:function(left,top,width,height){
 			console.log("piccolo2djs...refreshSize..");
 			this._size = {width:width,height:height};
 			this.element.style.left = left + "px";
 			this.element.style.top = top + "px";
 			this.element.style.width = width + "px";
 			this.element.style.height = height + "px";
+
 			this.fishEyeCalendar.refreshBySize(this._size);
-		}
+		},
+		debounce :function(func, wait, immediate) {
+	    var timeout, args, context, timestamp, result;
+
+	    var later = function() {
+	      var last = now() - timestamp;
+
+	      if (last < wait && last >= 0) {
+	        timeout = setTimeout(later, wait - last);
+	      } else {
+	        timeout = null;
+	        if (!immediate) {
+	          result = func.apply(context, args);
+	          if (!timeout) context = args = null;
+	        }
+	      }
+	    };
+	    return function() {
+	      context = this;
+	      args = arguments;
+	      timestamp = now();
+	      var callNow = immediate && !timeout;
+	      if (!timeout) timeout = setTimeout(later, wait);
+	      if (callNow) {
+	        result = func.apply(context, args);
+	        context = args = null;
+	      }
+
+	      return result;
+	    };
+	  }
 
 	};
 
@@ -174,5 +206,9 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			func.apply(context);
 		}, 0);
 	};
+
+	var now = Date.now || function() {
+    return new Date().getTime();
+  };
 
 }());

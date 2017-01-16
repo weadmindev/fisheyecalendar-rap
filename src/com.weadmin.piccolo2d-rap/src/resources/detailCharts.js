@@ -64,7 +64,7 @@
       }
       this.setTodayBoxBorderColor();
     },
-    setPosition:function(leftTopPointArr,dataObj){
+    setPosition:function(leftTopPointArr,dataObj,animateTime){
 
       var _this = this;
       this.leftTopPointArr = leftTopPointArr;
@@ -82,29 +82,27 @@
           var chartContainer = this.chartContainerArr[i][j];
           var lineCharts = this.lineChartsArr[i][j];
           // this.resetLineChartsByDateOrData(dataObj,hasEnlargeBox,lineCharts,i,j);
-          (function(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,animationTime,i,j){
-            setTimeout(function(){
-              $(chartContainer).animate({
-                left:curPointX+'px',
-                top:curPointY+'px',
-                width:(nextPointX - curPointX)+'px',
-                height:(nextPointY - curPointY)+'px'
-              },animationTime,'linear');
-            },10);
-            _this.refreshZoomAnimation(i,j,(nextPointX - curPointX),(nextPointY - curPointY));
-          })(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,_this.animationTime,i,j);
-          (function(lineCharts,i,j){
-            if(hasEnlargeBox && (_this.enlargeBox.xIndex != i || _this.enlargeBox.yIndex!=j)){
-              _this.setLineChartsSeriesShow(lineCharts,false,i,j);
+          (function(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,animationTime,ii,jj){
+            $(chartContainer).animate({
+              left:curPointX+'px',
+              top:curPointY+'px',
+              width:(nextPointX - curPointX)+'px',
+              height:(nextPointY - curPointY)+'px'
+            },animationTime,'linear');
+            _this.refreshZoomAnimation(ii,jj,(nextPointX - curPointX),(nextPointY - curPointY));
+          })(chartContainer,curPointX,curPointY,nextPointX,nextPointY,lineCharts,animateTime || _this.animationTime,i,j);
+          (function(lineCharts,ii,jj){
+            if(hasEnlargeBox && (_this.enlargeBox.xIndex != ii || _this.enlargeBox.yIndex!=jj)){
+              _this.setLineChartsSeriesShow(lineCharts,false,ii,jj);
             }else{
-              _this.setLineChartsSeriesShow(lineCharts,true,i,j);
+              _this.setLineChartsSeriesShow(lineCharts,true,ii,jj);
             }
           })(lineCharts,i,j);
         }
       }
       setTimeout(function(){
         _this.setOldEnlargeBox();
-      },this.animationTime);
+      },animateTime || this.animationTime);
     },
     resetLineChartsByDateOrData:function(leftTopPointArr,dataObj){  //if update the date or data,we need clear the charts and reset it.
       var _this = this;
