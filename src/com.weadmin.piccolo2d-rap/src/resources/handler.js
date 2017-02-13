@@ -19,7 +19,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 	}
 
 	eclipsesource.piccolo2djs = function(properties) {
-		bindAll(this, [ "layout", "onReady", "onSend", "onRender","refreshSize","debounce","showListOrigin"]);
+		bindAll(this, [ "layout", "onReady", "onSend", "onRender","refreshSize", "debounce","showListOrigin"]);
 		this.parent = rap.getObject(properties.parent); //获取java端的一个图形容器。
 		this.element = document.createElement("div");
 		this.parent.append(this.element);
@@ -158,7 +158,7 @@ var PICCOLO2D_BASEPATH = "rwt-resources/piccolo2djs/";
 			this.element.style.width = width + "px";
 			this.element.style.height = height + "px";
 
-			this.fishEyeCalendar.refreshBySize(this._size);
+			this.fishEyeCalendar.refreshBySize({width:width,height:height});
 		},
 		debounce :function(func, wait, immediate) {
 	    var timeout, args, context, timestamp, result;
