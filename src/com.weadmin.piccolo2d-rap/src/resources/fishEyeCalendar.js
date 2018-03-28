@@ -13,8 +13,8 @@
         this.height=0;
         this.xBoxNum = 7; //the number of days of one week.
         this.yBoxNum = 6;  //the number of row of one month.
-        this.boxWidthEnlargeRatio = 0.6;
-        this.boxHeightEnlargeRatio = 0.6;
+        this.boxWidthEnlargeRatio = 0.6; //放大的小格子的宽占最外层容器宽的比例
+        this.boxHeightEnlargeRatio = 0.6; //放大的小格子的高度占最外层容器高度的比例
         this.year = options.year;
         this.month = options.month;
 				this.isDefaulOpenToday = options.isDefaulOpenToday;
